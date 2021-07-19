@@ -1,6 +1,7 @@
+import java.io.Serializable;
 import java.util.Date;
 
-public class Fee {
+public class Fee implements Serializable {
 	Money amount;
 	Date date;
 	String type;

@@ -1,7 +1,8 @@
 
+import java.io.Serializable;
 import java.util.Date;
 
-public class LastTransaction {
+public class LastTransaction implements Serializable {
 	public Date date = new Date();
 	public Money priorBalance;
 	public Money changeInBalance;
