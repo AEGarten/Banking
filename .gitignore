@@ -4,6 +4,9 @@
 # Test drivers
 *[Tt]est*.java
 
+# Mac temp files
+*.DS_Store
+
 # Log file
 *.log
 
