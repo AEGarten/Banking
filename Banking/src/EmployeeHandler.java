@@ -17,7 +17,7 @@ public class EmployeeHandler {
 	}
 	
 	public void save(Employee employee) throws IOException {
-		String fileName = "Bank.csv";
+		String fileName = "BankEmployees.csv";
 		String name = employee.getName();
 		int ID = employee.getEmployeeID();
 		String userName = employee.getLoginusername();
