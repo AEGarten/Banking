@@ -3,7 +3,7 @@ import java.io.*;
 
 public class EmployeeHandler {
 	public void parse() throws IOException {
-		String fileName = "Bank.csv";
+		String fileName = "BankEmployees.csv";
 		List<String[]> data = new ArrayList<>();
 		try (BufferedReader br = new BufferedReader(new FileReader(fileName))) {
 			String line = "";
