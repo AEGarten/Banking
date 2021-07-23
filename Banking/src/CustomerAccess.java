@@ -22,7 +22,7 @@ public class CustomerAccess extends Message {
 	
 	//Teller
 	CustomerAccess(int sessionID, String passcode, int customerID){
-		super(sessionID, Process.ACCESS);
+		super(sessionID, Process.CUSTOMER_ACCESS);
 		this.passcode = passcode;
 		this.customerID = customerID;
 	}
