@@ -1,3 +1,4 @@
+import java.io.EOFException;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
@@ -42,7 +43,7 @@ public class Server {
 		}
 	}
 	
-	private static synchronized void Stop() { 	
+	public static synchronized void Stop() { 	
 		stopping = true;
 		System.out.println("Server stopping");
 	}
@@ -92,14 +93,16 @@ public class Server {
 		public void run() {
 			System.out.println("New client connected");
 			
+			Message msgOut = null;
+			Message msgIn = null;
 			try (
 				ObjectInputStream frClient = new ObjectInputStream(client.getInputStream());
 				ObjectOutputStream toClient = new ObjectOutputStream(client.getOutputStream());
 			){
 				while (!closeConnection) {
 				
-					Message msgOut = null;
-					Message msgIn = (Message) frClient.readObject();
+					
+					msgIn = (Message) frClient.readObject();
 					
 					//if not validated, attempt login
 					if (!validated) {
@@ -162,7 +165,7 @@ if (msgOut.success) System.out.println("Client "+ sessionID +" logged in");
 							sessionID = msgIn.sessionID;
 							validated = true;
 							
-System.out.println("Client "+ sessionID +" validated");
+System.out.println("Client "+ sessionID +" revalidated");
 							
 						}
 							
@@ -170,11 +173,12 @@ System.out.println("Client "+ sessionID +" validated");
 					}
 					//by now should be valid, if not send msgIn back (already has msg.success==false)
 					if (validated) {
+System.out.println("Client "+ sessionID +" attempting: "+ msgIn.perform);
 						switch(msgIn.perform) {
 						
 						case LOGOUT: msgOut = logout((Logout) msgIn); break;
 						
-						case ACCESS: msgOut = access((CustomerAccess) msgIn); break;
+						case CUSTOMER_ACCESS: msgOut = access((CustomerAccess) msgIn); break;
 
 							
 	//					case ADD_ACCOUNT:
@@ -214,14 +218,14 @@ System.out.println("Client "+ sessionID +" validated");
 	//						break;
 						case TRANSFER: {
 							if (msgIn instanceof ATMTransfer) msgOut = atmTransfer((ATMTransfer) msgIn);
-							else msgIn = tellerTransfer((TellerTransfer) msgIn);
+							else msgOut = tellerTransfer((TellerTransfer) msgIn);
 						} break;
 						
 	//					case TRANSFER_TOCUSTOMER:
 	//						break;
 						case WITHDRAWAL: {
 							if (msgIn instanceof ATMWithdrawal) msgOut = atmWithdrawal((ATMWithdrawal) msgIn);
-							else msgIn = tellerWithdrawal((TellerWithdrawal) msgIn);
+							else msgOut = tellerWithdrawal((TellerWithdrawal) msgIn);
 						} break;	
 							
 						default: toClient.writeObject(fail(msgIn, "invalid Process")); break;
@@ -231,10 +235,13 @@ System.out.println("Client "+ sessionID +" validated");
 					}
 					
 					else toClient.writeObject(fail(msgIn, "need Login object"));
+					
+					toClient.writeObject(msgOut);
 				}
 
 			}
 			catch (ClassNotFoundException e) { e.printStackTrace(); }
+			catch (EOFException e) { System.out.println("Client disconnected");}
 			catch (IOException e) { e.printStackTrace(); }
 			finally {
 				try { if (client != null) client.close(); } 
@@ -326,7 +333,6 @@ System.out.println("Thread closed");
 			if (acct == null) return new Balance(in, "no matching Account");
 			
 			Balance out = new Balance(acct.getBalance(), in);
-			closeConnection = true;
 			return out;
 
 		}

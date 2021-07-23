@@ -34,24 +34,36 @@ public class DataBase {
 		check.setBalance(new Money(23, 16, true));
 		check.setAttachedCard(true);
 		check.setCardID(567890);
+		check.addFee(overdraftFee);
+		check.addFee(overdraftFee);
+		
+		Account check2 = new Account(92840, AccountType.CHECKING);
+		check.setBalance(new Money(1000, 16, true));
 		
 		Account sav = new Account(52704706, AccountType.SAVINGS);
 		sav.setBalance(new Money(100, 01, true));
 		sav.setAttachedCard(true);
 		sav.setCardID(567890);
+		sav.addFee(overdraftFee);
 		
 		Customer cust = new Customer(4543, "Aidan Chartreuse");
 		cust.setPIN(1234);
 		cust.addAccount(check);
 		cust.addAccount(sav);
-		customers.add(cust);
+		cust.addAccount(check2);
+		addCustomer(cust);
 		
 		employeeIDs.addID(197);
 		loginToIDTable.put("Login", 197);
 		
 		Employee employee = new Employee("Dummy Employee", 197, "Login", "Password");
-		employees.add(employee);
+		addEmployee(employee);
 		
+		employeeIDs.addID(297);
+		loginToIDTable.put("Better, faster, stronger", 297);
+		employee = new Employee("Super Duper", 297, "Better, faster, stronger", "Passw0rd");
+		employee.setType(EmployeeType.SUPERVISOR);
+		addEmployee(employee);
 	}
 	
 	public Fee getOverdraftFee() {return this.overdraftFee; }
