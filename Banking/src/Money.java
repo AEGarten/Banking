@@ -269,16 +269,6 @@ public class Money implements Serializable {
 		else return this;
 	}
 	
-	//rounding propagates errors, only use at the end of a series of calculations
-	//better yet, don't use
-	public void setAsRounded() {
-		if (this.fraction > 0.98) {	//more strict because this is actually changing the number
-			this.fraction = 0.0;
-			this.cents += 1;
-			
-			resolve(this);
-		}
-	}
 	
 	public String toString() {
 		Money report = new Money(this);
