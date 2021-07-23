@@ -1,3 +1,4 @@
+package banking_dev;
 import java.io.Serializable;
 
 public class Money implements Serializable {
@@ -9,18 +10,6 @@ public class Money implements Serializable {
 	
 	
 	public Money() {}
-	
-	//truncates excess digits past the first two after the decimal
-	public Money(double value) {
-		dollars = (int) value;
-		cents = (int) ((value - dollars) * 100.0);
-		
-		if (value < 0) {
-			isPositive = false;			//isPositive true be default
-			dollars *= -1;
-			cents *= -1;
-		}
-	}
 	
 	public Money(int dollars, int cents, boolean isPositive) {
 		this.dollars = dollars;
@@ -277,10 +266,20 @@ public class Money implements Serializable {
 	//To be accurate to within one 0.001 cent, only need to round when > 0.009
 	public Money round() {
 		Money rounded = new Money(this.dollars, this.cents + 1, this.isPositive);
-		if (Math.abs(fraction) > 0.89) return rounded;	//more lenient than 0.9
+		if (this.fraction > 0.89) return rounded;	//more lenient than 0.9
 		else return this;
 	}
 	
+	//rounding propagates errors, only use at the end of a series of calculations
+	//better yet, don't use
+	public void setAsRounded() {
+		if (this.fraction > 0.98) {	//more strict because this is actually changing the number
+			this.fraction = 0.0;
+			this.cents += 1;
+			
+			resolve(this);
+		}
+	}
 	
 	public String toString() {
 		Money report = new Money(this);

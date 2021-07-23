@@ -1,3 +1,4 @@
+package banking_dev;
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.*;
@@ -95,7 +96,7 @@ public class ATMGUI {
 			JOptionPane.showMessageDialog(null, "Withdrawal successful");
 		}
 		else {
-			JOptionPane.showMessageDialog(null, "Withdrawal not successful, account in overdraft");
+			JOptionPane.showMessageDialog(null, "Withdrawal not successful");
 		}
 		
 		
@@ -114,7 +115,7 @@ public class ATMGUI {
 			JOptionPane.showMessageDialog(null, "Transfer successful");
 		}
 		else {
-			JOptionPane.showMessageDialog(null, "Transfer not successful, account in overdraft");
+			JOptionPane.showMessageDialog(null, "Transfer not successful");
 		}
 		return atm;
 		

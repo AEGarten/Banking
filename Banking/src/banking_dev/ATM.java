@@ -1,3 +1,4 @@
+package banking_dev;
 import java.io.EOFException;
 import java.io.IOException;
 import java.io.ObjectInputStream;
@@ -9,10 +10,7 @@ import java.util.Scanner;
 
 public class ATM {
 
-	private int checkingID = 0;
-	private int savingsID = 0;
-	private boolean checkingPositive = false;
-	private boolean savingsPositive = false;
+	private String location;
 	private Money localcash;
 	private ATMUser user;
 	private Socket socketconnection;
@@ -22,6 +20,7 @@ public class ATM {
 	Scanner sc = new Scanner(System.in);
 	
 	public ATM() {
+		this.location = new String();
 		this.localcash = new Money();
 		this.message = new Message();
 		this.user = new ATMUser();
@@ -29,7 +28,8 @@ public class ATM {
 		this.sessionID = 0;
 	}
 	
-	public ATM(Money localcash, Message message, ATMUser user, Socket socketconnection, int sessionID) {
+	public ATM(String location, Money localcash, Message message, ATMUser user, Socket socketconnection, int sessionID) {
+		this.location = location;
 		this.localcash = localcash;
 		this.message = message;
 		this.user = user;
@@ -54,10 +54,6 @@ public class ATM {
 			
 			ObjectInputStream inputStream = new ObjectInputStream(socketconnection.getInputStream());
 			ATMLogin atmlogin = (ATMLogin) inputStream.readObject();
-			checkingID = atmlogin.checkingID;
-			savingsID = atmlogin.savingsID;
-			checkingPositive = atmlogin.checkingPositive;
-			savingsPositive = atmlogin.savingsPositive;
 			sessionID = atmlogin.sessionID;
 			GUImessage = atmlogin.success;
 		} catch (ClassNotFoundException e) {
@@ -110,19 +106,11 @@ public class ATM {
 		amount.setCents(0);
 		
 		ATMWithdrawal withdrawal = null;
-		if(withdrawalsource.equalsIgnoreCase("Checking") & checkingPositive == true) {
+		if(withdrawalsource.equalsIgnoreCase("Checking")) {
 			withdrawal = new ATMWithdrawal(sessionID, amount,  user.getCheckingID());
 		}
-		else if(withdrawalsource.equalsIgnoreCase("Savings") & savingsPositive == true) {
+		else if(withdrawalsource.equalsIgnoreCase("Savings")) {
 			withdrawal = new ATMWithdrawal(sessionID, amount,  user.getSavingsID());
-		}
-		else if(withdrawalsource.equalsIgnoreCase("Checking") & checkingPositive == false) {
-			GUImessage = false;
-			return GUImessage;
-		}
-		else if(withdrawalsource.equalsIgnoreCase("Savings") & savingsPositive == false) {
-			GUImessage = false;
-			return GUImessage;
 		}
 		
 		try {
@@ -152,25 +140,15 @@ public class ATM {
 		amount.setDollars(Integer.parseInt(transferamount));
 		amount.setCents(0);
 		
-		ATMTransfer transfer = null;
-		if(transfersource.equalsIgnoreCase("Checking") & checkingPositive == true) {
+		
+		if(transfersource.equalsIgnoreCase("Checking")) {
 			sourceID = user.getCheckingID();
-			transfer = new ATMTransfer(sessionID, amount, Integer.parseInt(transfertarget), sourceID);
 		}
-		else if(transfersource.equalsIgnoreCase("Savings") & savingsPositive == true) {
+		else if(transfersource.equalsIgnoreCase("Savings")) {
 			sourceID = user.getSavingsID();
-			transfer = new ATMTransfer(sessionID, amount, Integer.parseInt(transfertarget), sourceID);
-		}
-		else if(transfersource.equalsIgnoreCase("Checking") & checkingPositive == false) {
-			GUImessage = false;
-			return GUImessage;
-		}
-		else if(transfersource.equalsIgnoreCase("Savings") & savingsPositive == false) {
-			GUImessage = false;
-			return GUImessage;
 		}
 		
-		
+		ATMTransfer transfer = new ATMTransfer(sessionID, amount, Integer.parseInt(transfertarget), sourceID);
 		
 		try {
 			OutputStream outputStream = socketconnection.getOutputStream();
