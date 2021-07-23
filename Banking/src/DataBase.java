@@ -28,30 +28,43 @@ public class DataBase {
 		cardToCustomerTable.put(567890, 4543);
 		
 		accountIDs.addID(92837);
-		accountIDs.addID(52704706);
+		accountIDs.addID(92840);
 		
 		Account check = new Account(92837, AccountType.CHECKING);
 		check.setBalance(new Money(23, 16, true));
 		check.setAttachedCard(true);
 		check.setCardID(567890);
+		check.addFee(overdraftFee);
+		check.addFee(overdraftFee);
+		
+		Account check2 = new Account(92840, AccountType.CHECKING);
+		check2.setBalance(new Money(1000, 16, true));
 		
 		Account sav = new Account(52704706, AccountType.SAVINGS);
 		sav.setBalance(new Money(100, 01, true));
 		sav.setAttachedCard(true);
 		sav.setCardID(567890);
+		sav.addFee(overdraftFee);
 		
 		Customer cust = new Customer(4543, "Aidan Chartreuse");
 		cust.setPIN(1234);
+		cust.setPasscode("Passcode");
 		cust.addAccount(check);
 		cust.addAccount(sav);
-		customers.add(cust);
+		cust.addAccount(check2);
+		addCustomer(cust);
 		
 		employeeIDs.addID(197);
 		loginToIDTable.put("Login", 197);
 		
 		Employee employee = new Employee("Dummy Employee", 197, "Login", "Password");
-		employees.add(employee);
+		addEmployee(employee);
 		
+		employeeIDs.addID(297);
+		loginToIDTable.put("Better, faster, stronger", 297);
+		employee = new Employee("Super Duper", 297, "Better, faster, stronger", "Passw0rd");
+		employee.setType(EmployeeType.SUPERVISOR);
+		addEmployee(employee);
 	}
 	
 	public Fee getOverdraftFee() {return this.overdraftFee; }
@@ -68,23 +81,6 @@ public class DataBase {
 		cardToCustomerTable.put(cardNum, customerID);
 	}
 	
-	public int getNewCustomerID() {
-		return customerIDs.findNewID();
-	}
-	
-	//reserve (not get) because it mutates id list for Account
-	//Customer has its id added when adding to the collection, account doesn't
-	public int reserveNewAccountID() {
-		int id = accountIDs.findNewID();
-		accountIDs.addID(id);
-		return id;
-	}
-	
-//	public int reserveNewEmployeeID() {
-//		int id = employeeIDs.findNewID();
-//		employeeIDs.addID(id);
-//		return id;
-//	}
 	
 	public synchronized Customer findCustomer(int custID) {
 		int foundIndex;
@@ -129,6 +125,12 @@ public class DataBase {
 			Collections.sort(customers, (a, b) -> a.getID() - b.getID()); //only sort if add successful
 		}
 		return success;
+	}
+	
+	public synchronized boolean addAccount(Customer c, Account a) {
+		//TODO: make installAccount, Customer, Employee. These are used to add new unID'd files to DataBase;
+		
+		return true;
 	}
 	
 	public synchronized boolean addEmployee(Employee e) {

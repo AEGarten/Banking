@@ -25,14 +25,13 @@ public class Account implements Serializable {
 	public Account(
 			int id, AccountType accountType,
 			Money balance, LastTransaction lastTransaction,
-			Date opened, Date closed,
-			boolean attCard, int cardID) {
+			Date opened, boolean attCard, 
+			int cardID) {
 		
 		this(id, accountType);
 		this.balance = balance;
 		this.lastTransaction = lastTransaction;
 		this.opened = opened;
-		this.closed = closed;
 		this.attachedCard = attCard;
 		this.cardID = cardID;
 	}
