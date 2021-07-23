@@ -29,7 +29,6 @@ public class DataBase {
 		
 		accountIDs.addID(92837);
 		accountIDs.addID(92840);
-		customerIDs.addID(52704706);
 		
 		Account check = new Account(92837, AccountType.CHECKING);
 		check.setBalance(new Money(23, 16, true));
@@ -49,6 +48,7 @@ public class DataBase {
 		
 		Customer cust = new Customer(4543, "Aidan Chartreuse");
 		cust.setPIN(1234);
+		cust.setPasscode("Passcode");
 		cust.addAccount(check);
 		cust.addAccount(sav);
 		cust.addAccount(check2);
@@ -81,23 +81,6 @@ public class DataBase {
 		cardToCustomerTable.put(cardNum, customerID);
 	}
 	
-	public int getNewCustomerID() {
-		return customerIDs.findNewID();
-	}
-	
-	//reserve (not get) because it mutates id list for Account
-	//Customer has its id added when adding to the collection, account doesn't
-	public int reserveNewAccountID() {
-		int id = accountIDs.findNewID();
-		accountIDs.addID(id);
-		return id;
-	}
-	
-//	public int reserveNewEmployeeID() {
-//		int id = employeeIDs.findNewID();
-//		employeeIDs.addID(id);
-//		return id;
-//	}
 	
 	public synchronized Customer findCustomer(int custID) {
 		int foundIndex;
@@ -142,6 +125,12 @@ public class DataBase {
 			Collections.sort(customers, (a, b) -> a.getID() - b.getID()); //only sort if add successful
 		}
 		return success;
+	}
+	
+	public synchronized boolean addAccount(Customer c, Account a) {
+		//TODO: make installAccount, Customer, Employee. These are used to add new unID'd files to DataBase;
+		
+		return true;
 	}
 	
 	public synchronized boolean addEmployee(Employee e) {
