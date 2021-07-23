@@ -10,6 +10,18 @@ public class Money implements Serializable {
 	
 	public Money() {}
 	
+	//truncates excess digits past the first two after the decimal
+	public Money(double value) {
+		dollars = (int) value;
+		cents = (int) ((value - dollars) * 100.0);
+		
+		if (value < 0) {
+			isPositive = false;			//isPositive true be default
+			dollars *= -1;
+			cents *= -1;
+		}
+	}
+	
 	public Money(int dollars, int cents, boolean isPositive) {
 		this.dollars = dollars;
 		this.cents = cents;
@@ -265,7 +277,7 @@ public class Money implements Serializable {
 	//To be accurate to within one 0.001 cent, only need to round when > 0.009
 	public Money round() {
 		Money rounded = new Money(this.dollars, this.cents + 1, this.isPositive);
-		if (this.fraction > 0.89) return rounded;	//more lenient than 0.9
+		if (Math.abs(fraction) > 0.89) return rounded;	//more lenient than 0.9
 		else return this;
 	}
 	
