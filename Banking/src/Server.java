@@ -258,7 +258,6 @@ System.out.println("Thread closed");
 			Customer customer = db.findCustomer(clientInfo.reCustomerID);
 			if (in.PIN == customer.getPIN()) {
 				validated = true;
-				clientInfo = new ClientInfo(customer.getID(), false);
 				sessionID = reserveSessionID(clientInfo);
 				
 				ArrayList<Account> accts = customer.getAccounts();

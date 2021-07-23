@@ -28,7 +28,8 @@ public class DataBase {
 		cardToCustomerTable.put(567890, 4543);
 		
 		accountIDs.addID(92837);
-		accountIDs.addID(52704706);
+		accountIDs.addID(92840);
+		customerIDs.addID(52704706);
 		
 		Account check = new Account(92837, AccountType.CHECKING);
 		check.setBalance(new Money(23, 16, true));
@@ -38,7 +39,7 @@ public class DataBase {
 		check.addFee(overdraftFee);
 		
 		Account check2 = new Account(92840, AccountType.CHECKING);
-		check.setBalance(new Money(1000, 16, true));
+		check2.setBalance(new Money(1000, 16, true));
 		
 		Account sav = new Account(52704706, AccountType.SAVINGS);
 		sav.setBalance(new Money(100, 01, true));
