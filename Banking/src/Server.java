@@ -196,7 +196,7 @@ System.out.println("Client "+ sessionID +" attempting: "+ msgIn.perform);
 	//						break;
 						case DEPOSIT: {
 							if (msgIn instanceof ATMDeposit) msgOut = atmDeposit((ATMDeposit) msgIn);
-							else msgIn = tellerDeposit((TellerDeposit) msgIn);
+							else msgOut = tellerDeposit((TellerDeposit) msgIn);
 						} break;	
 						
 						case DISMISS: msgOut = dismiss((Dismiss) msgIn); break;
@@ -311,9 +311,9 @@ System.out.println("Thread closed");
 			CustomerAccess out;
 			in.customer = db.findCustomer(in.customerID);
 			
-			if ( in.customer == null || 
-					!in.passcode.equals(in.customer.getPasscode()) ) 
-						out = new CustomerAccess(in, "no matching customer");
+			if (in.customer == null) out = new CustomerAccess(in, "no matching customer");
+			if (!in.passcode.equals(in.customer.getPasscode()) ) 
+						out = new CustomerAccess(in, "incorrect passcode");
 			else {
 				out = new CustomerAccess(in.customer, in);
 				clientInfo = new ClientInfo(in.customer.getID(), false);
