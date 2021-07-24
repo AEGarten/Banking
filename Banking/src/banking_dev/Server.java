@@ -1,4 +1,5 @@
 package banking_dev;
+import java.io.EOFException;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
@@ -93,18 +94,20 @@ public class Server {
 		public void run() {
 			System.out.println("New client connected");
 			
+			Message msgOut = null;
+			Message msgIn = null;
 			try (
 				ObjectInputStream frClient = new ObjectInputStream(client.getInputStream());
 				ObjectOutputStream toClient = new ObjectOutputStream(client.getOutputStream());
 			){
 				while (!closeConnection) {
-System.out.println("validating ...");				
-					Message msgOut = null;
-					Message msgIn = (Message) frClient.readObject();
+				
+					
+					msgIn = (Message) frClient.readObject();
 					
 					//if not validated, attempt login
 					if (!validated) {
-						
+System.out.println("validating ...");					
 
 						if (msgIn instanceof ATMLogin) {
 System.out.println("ATM type ...");							
@@ -149,7 +152,7 @@ System.out.println("Teller type ...");
 									break;
 								}
 								
-								msgOut = new TellerLogin(sessionID, msgIn.id, true);
+								msgOut = new TellerLogin(sessionID, msgIn.id, true, false);
 								
 								toClient.writeObject(msgOut);	//response
 								msgIn = (Message) frClient.readObject(); //new input
@@ -163,7 +166,7 @@ if (msgOut.success) System.out.println("Client "+ sessionID +" logged in");
 							sessionID = msgIn.sessionID;
 							validated = true;
 							
-System.out.println("Client "+ sessionID +" validated");
+System.out.println("Client "+ sessionID +" revalidated");
 							
 						}
 							
@@ -171,11 +174,12 @@ System.out.println("Client "+ sessionID +" validated");
 					}
 					//by now should be valid, if not send msgIn back (already has msg.success==false)
 					if (validated) {
+System.out.println("Client "+ sessionID +" attempting: "+ msgIn.perform);
 						switch(msgIn.perform) {
 						
 						case LOGOUT: msgOut = logout((Logout) msgIn); break;
 						
-						case ACCESS: msgOut = access((CustomerAccess) msgIn); break;
+						case CUSTOMER_ACCESS: msgOut = access((CustomerAccess) msgIn); break;
 
 							
 	//					case ADD_ACCOUNT:
@@ -192,7 +196,7 @@ System.out.println("Client "+ sessionID +" validated");
 	//					case CLOSE_CUSTOMER:
 	//						break;
 						case DEPOSIT: {
-							if (msgOut instanceof ATMDeposit) msgOut = atmDeposit((ATMDeposit) msgIn);
+							if (msgIn instanceof ATMDeposit) msgOut = atmDeposit((ATMDeposit) msgIn);
 							else msgOut = tellerDeposit((TellerDeposit) msgIn);
 						} break;	
 						
@@ -214,14 +218,14 @@ System.out.println("Client "+ sessionID +" validated");
 	//					case SHUTDOWN:
 	//						break;
 						case TRANSFER: {
-							if (msgOut instanceof ATMTransfer) msgOut = atmTransfer((ATMTransfer) msgIn);
+							if (msgIn instanceof ATMTransfer) msgOut = atmTransfer((ATMTransfer) msgIn);
 							else msgOut = tellerTransfer((TellerTransfer) msgIn);
 						} break;
 						
 	//					case TRANSFER_TOCUSTOMER:
 	//						break;
 						case WITHDRAWAL: {
-							if (msgOut instanceof ATMWithdrawal) msgOut = atmWithdrawal((ATMWithdrawal) msgIn);
+							if (msgIn instanceof ATMWithdrawal) msgOut = atmWithdrawal((ATMWithdrawal) msgIn);
 							else msgOut = tellerWithdrawal((TellerWithdrawal) msgIn);
 						} break;	
 							
@@ -232,10 +236,13 @@ System.out.println("Client "+ sessionID +" validated");
 					}
 					
 					else toClient.writeObject(fail(msgIn, "need Login object"));
+					
+					toClient.writeObject(msgOut);
 				}
 
 			}
 			catch (ClassNotFoundException e) { e.printStackTrace(); }
+			catch (EOFException e) { System.out.println("Client disconnected");}
 			catch (IOException e) { e.printStackTrace(); }
 			finally {
 				try { if (client != null) client.close(); } 
@@ -248,11 +255,10 @@ System.out.println("Thread closed");
 		
 		public Message fail(Message m, String why) { return new Message(m, why); }
 		
-		public ATMLogin validateATM(ATMLogin in) {
+		private ATMLogin validateATM(ATMLogin in) {
 			Customer customer = db.findCustomer(clientInfo.reCustomerID);
 			if (in.PIN == customer.getPIN()) {
 				validated = true;
-				clientInfo = new ClientInfo(customer.getID(), false);
 				sessionID = reserveSessionID(clientInfo);
 				
 				ArrayList<Account> accts = customer.getAccounts();
@@ -296,19 +302,19 @@ System.out.println("Thread closed");
 			return new ATMLogin(in, "invalid PIN"); //fail
 		}
 		
-		public Logout logout(Logout in) {
+		private Logout logout(Logout in) {
 			sessionIDs.remove(sessionID);
 			closeConnection = true;
 			return new Logout(in);
 		}
 		
-		public CustomerAccess access(CustomerAccess in) {
+		private CustomerAccess access(CustomerAccess in) {
 			CustomerAccess out;
 			in.customer = db.findCustomer(in.customerID);
 			
-			if ( in.customer == null || 
-					!in.passcode.equals(in.customer.getPasscode()) ) 
-						out = new CustomerAccess(in, "no matching customer");
+			if (in.customer == null) out = new CustomerAccess(in, "no matching customer");
+			if (!in.passcode.equals(in.customer.getPasscode()) ) 
+						out = new CustomerAccess(in, "incorrect passcode");
 			else {
 				out = new CustomerAccess(in.customer, in);
 				clientInfo = new ClientInfo(in.customer.getID(), false);
@@ -320,19 +326,18 @@ System.out.println("Thread closed");
 			return new Dismiss(in);
 		}
 		
-		public Balance balance(Balance in) {
+		private Balance balance(Balance in) {
 			Customer cust = db.findCustomer(clientInfo.reCustomerID);
 			if (cust == null) return new Balance(in, "no matching Customer");
 			Account acct = cust.findAccount(in.accountID);
 			if (acct == null) return new Balance(in, "no matching Account");
 			
 			Balance out = new Balance(acct.getBalance(), in);
-			closeConnection = true;
 			return out;
 
 		}
 		
-		public ATMDeposit atmDeposit(ATMDeposit in) {
+		private ATMDeposit atmDeposit(ATMDeposit in) {
 			Customer cust = db.findCustomer(clientInfo.reCustomerID);
 			if (cust == null) return new ATMDeposit(in, "no matching Customer");
 			Account acct = cust.findAccount(in.accountID);
@@ -344,7 +349,7 @@ System.out.println("Thread closed");
 			return new ATMDeposit(in, acct.isPositiveStatus());
 		}
 		
-		public TellerDeposit tellerDeposit(TellerDeposit in) {
+		private TellerDeposit tellerDeposit(TellerDeposit in) {
 			Customer cust = db.findCustomer(clientInfo.reCustomerID);
 			if (cust == null) return new TellerDeposit(in, "no matching Customer");
 			
@@ -353,7 +358,7 @@ System.out.println("Thread closed");
 			return new TellerDeposit(in);
 		}
 		
-		public ATMWithdrawal atmWithdrawal(ATMWithdrawal in) {
+		private ATMWithdrawal atmWithdrawal(ATMWithdrawal in) {
 			Customer cust = db.findCustomer(clientInfo.reCustomerID);
 			if (cust == null) return new ATMWithdrawal(in, "no matching Customer");
 			Account acct = cust.findAccount(in.accountID);
@@ -375,7 +380,7 @@ System.out.println("Thread closed");
 			return new ATMWithdrawal(in, acct.isPositiveStatus());
 		}
 		
-		public TellerWithdrawal tellerWithdrawal(TellerWithdrawal in) {
+		private TellerWithdrawal tellerWithdrawal(TellerWithdrawal in) {
 			Customer cust = db.findCustomer(clientInfo.reCustomerID);
 			if (cust == null) return new TellerWithdrawal(in, "no matching Customer");
 			
@@ -393,7 +398,7 @@ System.out.println("Thread closed");
 			return new TellerWithdrawal(in);
 		}
 		
-		public TellerTransfer tellerTransfer(TellerTransfer in) {
+		private TellerTransfer tellerTransfer(TellerTransfer in) {
 			Customer cust = db.findCustomer(clientInfo.reCustomerID);
 			if (cust == null) return new TellerTransfer(in, "no matching Customer");
 			
@@ -415,7 +420,7 @@ System.out.println("Thread closed");
 			return new TellerTransfer(in);
 		}
 		
-		public ATMTransfer atmTransfer(ATMTransfer in) {
+		private ATMTransfer atmTransfer(ATMTransfer in) {
 			Customer cust = db.findCustomer(clientInfo.reCustomerID);
 			if (cust == null) return new ATMTransfer(in, "no matching Customer");
 			Account toAcct = cust.findAccount(in.toAccountID);

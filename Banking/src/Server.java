@@ -151,7 +151,7 @@ System.out.println("Teller type ...");
 									break;
 								}
 								
-								msgOut = new TellerLogin(sessionID, msgIn.id, true);
+								msgOut = new TellerLogin(sessionID, msgIn.id, true, false);
 								
 								toClient.writeObject(msgOut);	//response
 								msgIn = (Message) frClient.readObject(); //new input

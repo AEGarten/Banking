@@ -28,8 +28,9 @@ public class TellerLogin extends Message {
 	}
 	
 	//for Server, success
-	public TellerLogin(int sessionID, int id, boolean success) {
+	public TellerLogin(int sessionID, int id, boolean success, boolean supervisor) {
 		super(sessionID, id, success);
+		supervisor = supervisor;
 	}
 	
 	//for Server, fail

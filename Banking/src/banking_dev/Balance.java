@@ -17,8 +17,8 @@ package banking_dev;
 	 */
 
 public class Balance extends Message {
-	Money amount;
-	int accountID; 
+	public Money amount;
+	public int accountID; 
 
 	//ATM use
 	public Balance(int sessionID, int accountID) {
@@ -33,7 +33,7 @@ public class Balance extends Message {
 	}
 	
 	//Server fail
-		public Balance(Message m, String why) {
-			super(m, why);
-		}
+	public Balance(Message m, String why) {
+		super(m, why);
+	}
 }
