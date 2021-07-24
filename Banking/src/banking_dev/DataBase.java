@@ -30,17 +30,16 @@ public class DataBase {
 		accountIDs.addID(92837);
 		accountIDs.addID(92840);
 		
-		Account check = new Account(92837, AccountType.CHECKING);
-		check.setBalance(new Money(23, 16, true));
-		check.setAttachedCard(true);
-		check.setCardID(567890);
+		LastTransaction lTrans = new LastTransaction(new Money(1261.00), new Money(-60.40), "teller withdrawal");
+		
+//		Account check = new Account(, );
+		Account check = new Account(92837, AccountType.CHECKING, new Money(23.16), null, new Date(), true, 567890);
 		check.addFee(overdraftFee);
 		check.addFee(overdraftFee);
 		
-		Account check2 = new Account(92840, AccountType.CHECKING);
-		check2.setBalance(new Money(1000, 16, true));
+		Account check2 = new Account(92840, AccountType.CHECKING, new Money(1000.16), null, new Date(), false, 0);
 		
-		Account sav = new Account(52704706, AccountType.SAVINGS);
+		Account sav = new Account(567, AccountType.SAVINGS, new Money(100.01), null, new Date(), true, 567890);
 		sav.setBalance(new Money(100, 01, true));
 		sav.setAttachedCard(true);
 		sav.setCardID(567890);
@@ -61,7 +60,6 @@ public class DataBase {
 				"secret", 2, 
 				0, 0, 
 				new Date(System.currentTimeMillis() - 7*24*3600_000));
-		LastTransaction lTrans = new LastTransaction(new Money(1261.00), new Money(-60.40), "teller withdrawal");
 		sav = new Account(
 				34, AccountType.SAVINGS, 
 				new Money(1200.60), lTrans, 

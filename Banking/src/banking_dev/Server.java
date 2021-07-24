@@ -5,11 +5,8 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.net.ServerSocket;
 import java.net.Socket;
-import java.net.SocketException;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.Date;
-import java.util.List;
 import java.util.Random;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -97,89 +94,55 @@ public class Server {
 				ObjectOutputStream toClient = new ObjectOutputStream(client.getOutputStream());
 			){
 				while (!closeConnection) {
-				
-					
 					msgIn = (Message) frClient.readObject();
 					
 					//if not validated, attempt login
 					if (!validated) {
-System.out.println("validating ...");					
+						System.out.println("validating ...");					
 
 						if (msgIn instanceof ATMLogin) {
-System.out.println("ATM type ...");							
-							//fail out if not online
-							if (!online) {
-								msgOut = new ATMLogin(msgIn, "Server not Online");
-								closeConnection = true;
-								break;
-							}
 							
-							ATMLogin ATMmsg = (ATMLogin) msgIn;
-							clientInfo.reCustomerID = db.getCustomerFromCard(ATMmsg.cardID);
+							System.out.println("ATM type ...");							
 							
-							//if 0 then could be null, good point to stop instead of synch for db access
-							if (clientInfo.reCustomerID <= 0) {
-								toClient.writeObject(new ATMLogin(msgIn, "invalid Card ID"));
-								break;
-							}
-							
-							msgOut = validateATM(ATMmsg);
+							msgOut = validateATM((ATMLogin) msgIn);
 							toClient.writeObject(msgOut);	//response
+							closeConnection = !msgOut.success;
 							
-if (msgOut.success) System.out.println("Client "+ sessionID +" logged in");
-						
-							msgIn = (Message) frClient.readObject(); //new input
+							if (msgOut.success) System.out.println("Client "+ sessionID +" logged in");
+							continue;
+//							msgIn = (Message) frClient.readObject(); //new input
 
 						}
 						//if from Teller
 						else if (msgIn instanceof TellerLogin) {
-System.out.println("Teller type ...");	
-							TellerLogin Tmsg = (TellerLogin) msgIn;
 							
-							Employee emp = db.findEmployee(db.employeeLoginToID(Tmsg.login));
-							if (emp == null) {
-								toClient.writeObject(new TellerLogin(msgIn, "no matching employee login"));
-								break;
-							}
-							if (Tmsg.login.equals(emp.getLoginusername()) && Tmsg.password.equals(emp.getLoginpwd())) {
-								
-								validated = true;
-								clientInfo.isSupervisor = (emp.getType() == EmployeeType.SUPERVISOR);  
-								sessionID = Server.reserveSessionID(clientInfo);
-								
-								if (!online && !clientInfo.isSupervisor) {
-									msgOut = new TellerLogin(msgIn, "Server not Online, Supervisor access required");
-									closeConnection = true;
-									break;
-								}
-								
-								msgOut = new TellerLogin(sessionID, msgIn.id, true, clientInfo.isSupervisor);
-								
-								toClient.writeObject(msgOut);	//response
-								msgIn = (Message) frClient.readObject(); //new input
-								
-if (msgOut.success) {
-	System.out.print("Client "+ sessionID);
-	if (clientInfo.isSupervisor) System.out.print(" Supervisor");
-	System.out.println(" logged in");
-}
+							System.out.println("Teller type ...");	
 
+							msgOut = validateTeller((TellerLogin) msgIn);								
+							toClient.writeObject(msgOut);	//response
+							closeConnection = !msgOut.success;
+//							msgIn = (Message) frClient.readObject(); //new input
+								
+							if (msgOut.success) {
+								System.out.print("Client "+ sessionID);
+								if (clientInfo.isSupervisor) System.out.print(" Supervisor");
+								System.out.println(" logged in");
 							}
+							continue;
 						}	
 						else if (sessionIDs.contains(msgIn.sessionID)) {
 							clientInfo = sessionIDs.get(msgIn.sessionID);
 							sessionID = msgIn.sessionID;
 							validated = true;
 							
-System.out.println("Client "+ sessionID +" revalidated");
+							System.out.println("Client "+ sessionID +" revalidated");
 							
 						}
-							
-						else break;	//no login, no valid sessionID, close connection
+						else closeConnection = true;	//no login, no valid sessionID, close connection
 					}
 					//by now should be valid, if not send msgIn back (already has msg.success==false)
 					if (validated) {
-System.out.println("Client "+ sessionID +" attempting: "+ msgIn.perform);
+						System.out.println("Client "+ sessionID +" attempting: "+ msgIn.perform);
 						switch(msgIn.perform) {
 						
 						case LOGOUT: msgOut = logout((Logout) msgIn); break;
@@ -240,7 +203,7 @@ System.out.println("Client "+ sessionID +" attempting: "+ msgIn.perform);
 						}
 					}
 					
-					else toClient.writeObject(new Message (msgIn, "need Login object"));
+					else toClient.writeObject(new Message (msgIn, "login failed"));
 					
 					toClient.writeObject(msgOut);
 				}
@@ -252,14 +215,45 @@ System.out.println("Client "+ sessionID +" attempting: "+ msgIn.perform);
 			finally {
 				try { if (client != null) client.close(); } 
 				catch (Exception e) { e.printStackTrace(); }
-System.out.println("Thread closed");
+				System.out.println("Thread closed");
 			}
-			
 			
 		}
 		
+		private TellerLogin validateTeller(TellerLogin in) {
+			TellerLogin out = null;
+			Employee emp = db.findEmployee(db.employeeLoginToID(in.login));
+			
+			if (emp == null) {
+				out = new TellerLogin(in, "no matching employee login");
+				closeConnection = true;
+			}
+			else if (in.login.equals(emp.getLoginusername()) && in.password.equals(emp.getLoginpwd())) {
+				validated = true;
+				clientInfo.isSupervisor = (emp.getType() == EmployeeType.SUPERVISOR);  
+				sessionID = Server.reserveSessionID(clientInfo);
+				
+				if (!online && !clientInfo.isSupervisor) {
+					out = new TellerLogin(in, "Server not Online, Supervisor access required");
+					closeConnection = true;
+				}
+				else out = new TellerLogin(sessionID, in.id, true, clientInfo.isSupervisor);
+			}
+			else out = new TellerLogin(in, "invalid password");
+			return out;
+		}
+		
 		private ATMLogin validateATM(ATMLogin in) {
+			
+			if (!online) return new ATMLogin(in, "Server not Online"); //fail out if not online
+			
+			clientInfo.reCustomerID = db.getCustomerFromCard(in.cardID);
 			Customer customer = db.findCustomer(clientInfo.reCustomerID);
+			
+			//if 0 then could be null, good point to stop instead of synch for db access
+			if (clientInfo.reCustomerID <= 0) return new ATMLogin(in, "invalid Card ID");
+			
+			ATMLogin out;
 			if (in.PIN == customer.getPIN()) {
 				validated = true;
 				sessionID = reserveSessionID(clientInfo);
@@ -294,7 +288,6 @@ System.out.println("Thread closed");
 						}
 					}
 				}
-				ATMLogin out;
 				if (gotChecking || gotSavings) {
 					out = new ATMLogin(checkID, savID, checkPosStat, savPosStat, sessionID, in); //success
 				}
