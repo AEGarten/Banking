@@ -17,25 +17,25 @@ package banking_dev;
 	 */
 
 public class CustomerAccess extends Message {
-	String passcode = "";
-	int customerID = 0;
-	Customer customer = null;
+	public String passcode = "";
+	public int customerID = 0;
+	public Customer customer = null;
 	
 	//Teller
-	CustomerAccess(int sessionID, String passcode, int customerID){
+	public CustomerAccess(int sessionID, String passcode, int customerID){
 		super(sessionID, Process.ACCESS);
 		this.passcode = passcode;
 		this.customerID = customerID;
 	}
 	
 	//Server success
-	CustomerAccess(Customer c, Message m){
+	public CustomerAccess(Customer c, Message m){
 		super(m.sessionID, m.id, true);
 		this.customer = c;
 	}
 	
 	//Server fail
-		CustomerAccess(Message m, String why){
-			super(m, why);
-		}
+	public CustomerAccess(Message m, String why){
+		super(m, why);
+	}
 }

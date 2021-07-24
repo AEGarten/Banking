@@ -17,8 +17,8 @@ package banking_dev;
 	 */
 
 public class TellerLogin extends Message {
-	String login = "";
-	String password = "";
+	public String login = "";
+	public String password = "";
 	
 	//for Teller
 	public TellerLogin(String login, String pw) {
