@@ -96,7 +96,7 @@ public class ATMGUI {
 			JOptionPane.showMessageDialog(null, "Withdrawal successful");
 		}
 		else {
-			JOptionPane.showMessageDialog(null, "Withdrawal not successful");
+			JOptionPane.showMessageDialog(null, "Withdrawal not successful, account in overdraft");
 		}
 		
 		
@@ -115,7 +115,7 @@ public class ATMGUI {
 			JOptionPane.showMessageDialog(null, "Transfer successful");
 		}
 		else {
-			JOptionPane.showMessageDialog(null, "Transfer not successful");
+			JOptionPane.showMessageDialog(null, "Transfer not successful, account in overdraft");
 		}
 		return atm;
 		

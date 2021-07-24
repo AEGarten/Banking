@@ -8,7 +8,6 @@ enum Process {
 	DEPOSIT,			//Teller or ATM
 	WITHDRAWAL,			//Teller or ATM
 	TRANSFER,			//Teller or ATM
-	TRANSFER_TOCUSTOMER,	//Teller: when transferring to a different customer at this same bank
 	BALANCE,			//ATM only
 	CLOSE_ACCOUNT,		//Teller only
 	ADD_ACCOUNT,		//Teller only
@@ -21,10 +20,9 @@ enum Process {
 	ONLINE,				//Supervisor only
 	SHUTDOWN,			//Supervisor only
 	SAVE,				//Supervisor only
-	LOAD,				//Supervisor only
 	LOGIN,				//Teller or ATM
 	LOGOUT, 			//Teller or ATM
-	ACCESS,				//Teller: when an employee wants Access to a customer
+	CUSTOMER_ACCESS,	//Teller: when an employee wants Access to a customer
 	DISMISS,			//Teller: when a customer is finished with Teller (Customer logout)
 	
 	EMPLOYEE_ACCESS,	//Supervisor only
