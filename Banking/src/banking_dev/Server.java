@@ -24,7 +24,7 @@ public class Server {
 	private static boolean stopping = false;
 	
 	//TODO make false when ATM fully functional
-	private static boolean online = true;		//Server starts up offline till Supervisor command
+	private static boolean online = true;		//Server starts up offline till Supervisor turns on
 	
 	//for keeping track of clients, what type, re: what Customer, supervisor status; all mapped to session id
 	private static ConcurrentHashMap<Integer, ClientInfo> sessionIDs = new ConcurrentHashMap<>();
@@ -153,12 +153,16 @@ System.out.println("Teller type ...");
 									break;
 								}
 								
-								msgOut = new TellerLogin(sessionID, msgIn.id, true, false);
+								msgOut = new TellerLogin(sessionID, msgIn.id, true, clientInfo.isSupervisor);
 								
 								toClient.writeObject(msgOut);	//response
 								msgIn = (Message) frClient.readObject(); //new input
 								
-if (msgOut.success) System.out.println("Client "+ sessionID +" logged in");
+if (msgOut.success) {
+	System.out.print("Client "+ sessionID);
+	if (clientInfo.isSupervisor) System.out.print(" Supervisor");
+	System.out.println(" logged in");
+}
 
 							}
 						}	
