@@ -33,7 +33,7 @@ public class Balance extends Message {
 	}
 	
 	//Server fail
-		public Balance(Message m, String why) {
-			super(m, why);
-		}
+	public Balance(Message m, String why) {
+		super(m, why);
+	}
 }

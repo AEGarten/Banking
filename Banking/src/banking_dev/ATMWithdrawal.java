@@ -19,7 +19,7 @@ package banking_dev;
 public class ATMWithdrawal extends Message {
 	public Money amount;
 	public int accountID;
-	boolean accountPositive;
+	public boolean accountPositive;
 	
 	//ATM use
 	public ATMWithdrawal(int sessionID, Money amount, int accountID) {

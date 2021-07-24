@@ -20,8 +20,8 @@ public class ATMTransfer extends Message {
 	public Money amount;
 	public int toAccountID;
 	public int frAccountID;
-	boolean frAccountPositive;
-	boolean toAccountPositive;
+	public boolean frAccountPositive;
+	public boolean toAccountPositive;
 	
 	//ATM use
 	public ATMTransfer(int sessionID, Money amount, int toID, int frID) {
