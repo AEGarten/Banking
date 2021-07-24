@@ -1,3 +1,4 @@
+package banking_dev;
 
 /*
 	 * Message //parent
@@ -15,26 +16,24 @@
 	 * +Message(Message, why)			//server: fail
 	 */
 
-public class TellerLogin extends Message {
-	String login = "";
-	String password = "";
-	boolean supervisor = false;
-	
-	//for Teller
-	public TellerLogin(String login, String pw) {
-		super();
-		this.login = login;
-		this.password = pw;
+public class Balance extends Message {
+	public Money amount;
+	public int accountID; 
+
+	//ATM use
+	public Balance(int sessionID, int accountID) {
+		super(sessionID, Process.BALANCE);
+		this.accountID = accountID;
+	}
+
+	//Server success
+	public Balance(Money amount, Message m) {
+		super(m.sessionID, m.id, true);
+		this.amount = amount;
 	}
 	
-	//for Server, success
-	public TellerLogin(int sessionID, int id, boolean success, boolean supervisor) {
-		super(sessionID, id, success);
-		supervisor = supervisor;
-	}
-	
-	//for Server, fail
-	public TellerLogin(Message m, String why) {
+	//Server fail
+	public Balance(Message m, String why) {
 		super(m, why);
 	}
 }
