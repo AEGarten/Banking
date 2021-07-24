@@ -1,10 +1,9 @@
 package banking_dev;
+
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
 public class DataBase {
@@ -53,17 +52,35 @@ public class DataBase {
 		cust.addAccount(check);
 		cust.addAccount(sav);
 		cust.addAccount(check2);
+		cust.setNumChecking(2);
+		cust.setNumSavings(0);
 		addCustomer(cust);
 		
-		employeeIDs.addID(197);
-		loginToIDTable.put("Login", 197);
+		cust = new Customer(
+				444, "Sam Johnson", 
+				"secret", 2, 
+				0, 0, 
+				new Date(System.currentTimeMillis() - 7*24*3600_000));
+		LastTransaction lTrans = new LastTransaction(new Money(1261.00), new Money(-60.40), "teller withdrawal");
+		sav = new Account(
+				34, AccountType.SAVINGS, 
+				new Money(1200.60), lTrans, 
+				new Date(System.currentTimeMillis() - 5*24*3600_000), false, 
+				0);
+		cust.addAccount(sav);
+		lTrans = new LastTransaction(new Money(0.01), new Money(6.00), "teller deposit");
+		sav = new Account(
+				39, AccountType.SAVINGS, 
+				new Money(6.01), lTrans, 
+				new Date(System.currentTimeMillis() - 24*3600_000), false, 
+				0);
+		cust.addAccount(sav);
+		addCustomer(cust);
 		
-		Employee employee = new Employee("Dummy Employee", 197, "Login", "Password");
+		Employee employee = new Employee("C. Smith", 197, "Login", "Password");
 		addEmployee(employee);
 		
-		employeeIDs.addID(297);
-		loginToIDTable.put("Better, faster, stronger", 297);
-		employee = new Employee("Super Duper", 297, "Better, faster, stronger", "Passw0rd");
+		employee = new Employee("Dave S.", 297, "Better, faster, stronger", "Passw0rd");
 		employee.setType(EmployeeType.SUPERVISOR);
 		addEmployee(employee);
 	}
@@ -137,11 +154,17 @@ public class DataBase {
 	public synchronized boolean addEmployee(Employee e) {
 		boolean success = false;
 		
-		if (employeeIDs.addID(e.getEmployeeID()) && employees.add(e)) {
+		if ( employeeIDs.addID(e.getEmployeeID()) && 
+				employees.add(e) &&
+				(loginToIDTable.put(e.getLoginusername(), e.getEmployeeID()) == null) ){
 			success = true;
 			Collections.sort(employees, (a, b) -> a.getEmployeeID() - b.getEmployeeID()); //only sort if add successful
 		}
 		return success;
+	}
+	
+	public int employeeLoginToID(String login) {
+		return loginToIDTable.get(login);
 	}
 	
 	public synchronized Employee findEmployee(int empID) {

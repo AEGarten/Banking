@@ -22,8 +22,9 @@ public class Server {
 	private static int port;
 	private static DataBase db = new DataBase();
 	private static boolean stopping = false;
-	private static boolean online = true;
-	//TODO add shutdown precaution when active (mutators) Clients present
+	
+	//TODO make false when ATM fully functional
+	private static boolean online = true;		//Server starts up offline till Supervisor turns on
 	
 	//for keeping track of clients, what type, re: what Customer, supervisor status; all mapped to session id
 	private static ConcurrentHashMap<Integer, ClientInfo> sessionIDs = new ConcurrentHashMap<>();
@@ -35,13 +36,8 @@ public class Server {
 	
 	//keeps track of various info for each client in session
 	public static class ClientInfo{
-		public int reCustomerID;
-		public boolean isSupervisor;
-		
-		public ClientInfo(int id, boolean isSupe) {
-			this.reCustomerID = id; //re: concerning what customer
-			this.isSupervisor = isSupe;
-		}
+		public int reCustomerID = 0;
+		public boolean isSupervisor = false;
 	}
 	
 	public static synchronized void Stop() { 	
@@ -84,10 +80,10 @@ public class Server {
 		private final Socket client;
 		private boolean validated = false; //has the clients credentials been validated
 		int sessionID = 0;	//continues session after closing connection w/o login each time
-		ClientInfo clientInfo = new ClientInfo(sessionID, false);	//clientType, re: Customer id, isSupervisor
+		ClientInfo clientInfo = new ClientInfo();	//clientType, re: Customer id, isSupervisor
 		boolean closeConnection = false;	//close out client connection
 		
-		public ClientHandler(Socket newClient) { this.client = newClient; }
+		private ClientHandler(Socket newClient) { this.client = newClient; }
 		
 		
 		@Override
@@ -113,7 +109,7 @@ System.out.println("validating ...");
 System.out.println("ATM type ...");							
 							//fail out if not online
 							if (!online) {
-								msgOut = fail(msgIn, "Server not Online");
+								msgOut = new ATMLogin(msgIn, "Server not Online");
 								closeConnection = true;
 								break;
 							}
@@ -123,7 +119,7 @@ System.out.println("ATM type ...");
 							
 							//if 0 then could be null, good point to stop instead of synch for db access
 							if (clientInfo.reCustomerID <= 0) {
-								toClient.writeObject(fail(msgIn, "invalid Card ID"));
+								toClient.writeObject(new ATMLogin(msgIn, "invalid Card ID"));
 								break;
 							}
 							
@@ -140,24 +136,33 @@ if (msgOut.success) System.out.println("Client "+ sessionID +" logged in");
 System.out.println("Teller type ...");	
 							TellerLogin Tmsg = (TellerLogin) msgIn;
 							
-							//TODO update when employee updated
-							if (Tmsg.login.equals("Login") && Tmsg.password.equals("Password")) {
+							Employee emp = db.findEmployee(db.employeeLoginToID(Tmsg.login));
+							if (emp == null) {
+								toClient.writeObject(new TellerLogin(msgIn, "no matching employee login"));
+								break;
+							}
+							if (Tmsg.login.equals(emp.getLoginusername()) && Tmsg.password.equals(emp.getLoginpwd())) {
+								
 								validated = true;
-								clientInfo = new ClientInfo(0, false); //no Customer to access yet, so 0
+								clientInfo.isSupervisor = (emp.getType() == EmployeeType.SUPERVISOR);  
 								sessionID = Server.reserveSessionID(clientInfo);
 								
 								if (!online && !clientInfo.isSupervisor) {
-									msgOut = fail(msgIn, "Server not Online, Supervisor access required");
+									msgOut = new TellerLogin(msgIn, "Server not Online, Supervisor access required");
 									closeConnection = true;
 									break;
 								}
 								
-								msgOut = new TellerLogin(sessionID, msgIn.id, true, false);
+								msgOut = new TellerLogin(sessionID, msgIn.id, true, clientInfo.isSupervisor);
 								
 								toClient.writeObject(msgOut);	//response
 								msgIn = (Message) frClient.readObject(); //new input
 								
-if (msgOut.success) System.out.println("Client "+ sessionID +" logged in");
+if (msgOut.success) {
+	System.out.print("Client "+ sessionID);
+	if (clientInfo.isSupervisor) System.out.print(" Supervisor");
+	System.out.println(" logged in");
+}
 
 							}
 						}	
@@ -179,7 +184,7 @@ System.out.println("Client "+ sessionID +" attempting: "+ msgIn.perform);
 						
 						case LOGOUT: msgOut = logout((Logout) msgIn); break;
 						
-						case CUSTOMER_ACCESS: msgOut = access((CustomerAccess) msgIn); break;
+						case CUSTOMER_ACCESS: msgOut = customerAccess((CustomerAccess) msgIn); break;
 
 							
 	//					case ADD_ACCOUNT:
@@ -229,13 +234,13 @@ System.out.println("Client "+ sessionID +" attempting: "+ msgIn.perform);
 							else msgOut = tellerWithdrawal((TellerWithdrawal) msgIn);
 						} break;	
 							
-						default: toClient.writeObject(fail(msgIn, "invalid Process")); break;
+						default: toClient.writeObject(new Message(msgIn, "invalid Process")); break;
 							
 
 						}
 					}
 					
-					else toClient.writeObject(fail(msgIn, "need Login object"));
+					else toClient.writeObject(new Message (msgIn, "need Login object"));
 					
 					toClient.writeObject(msgOut);
 				}
@@ -252,8 +257,6 @@ System.out.println("Thread closed");
 			
 			
 		}
-		
-		public Message fail(Message m, String why) { return new Message(m, why); }
 		
 		private ATMLogin validateATM(ATMLogin in) {
 			Customer customer = db.findCustomer(clientInfo.reCustomerID);
@@ -308,7 +311,7 @@ System.out.println("Thread closed");
 			return new Logout(in);
 		}
 		
-		private CustomerAccess access(CustomerAccess in) {
+		private CustomerAccess customerAccess(CustomerAccess in) {
 			CustomerAccess out;
 			in.customer = db.findCustomer(in.customerID);
 			
@@ -317,7 +320,7 @@ System.out.println("Thread closed");
 						out = new CustomerAccess(in, "incorrect passcode");
 			else {
 				out = new CustomerAccess(in.customer, in);
-				clientInfo = new ClientInfo(in.customer.getID(), false);
+				clientInfo.reCustomerID = in.customerID;
 			}
 			return out; 
 		}
