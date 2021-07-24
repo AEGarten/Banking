@@ -35,6 +35,7 @@ public class Account implements Serializable {
 		this.opened = opened;
 		this.attachedCard = attCard;
 		this.cardID = cardID;
+		
 	}
 
 	public boolean isPositiveStatus() { return this.balance.isGreater(new Money()); }

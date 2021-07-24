@@ -1,3 +1,4 @@
+package banking_dev;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -8,7 +9,7 @@ import java.text.ParseException;
 public class CustomerFile {
 	// private String[][][] data;
 	private Customer customer;
-	private AccountType accounttype;
+	//private AccountType accounttype;
 	private Account account;
 	private Fee fees;
 	private LastTransaction lasttransaction;
