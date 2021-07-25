@@ -1,4 +1,3 @@
-package banking_dev;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.ObjectInputStream;
@@ -9,20 +8,22 @@ import java.net.UnknownHostException;
 import java.util.*;
 import java.util.Scanner;
 
+import java.util.*;
+
 public class Teller {
 	private Socket socket;
 	private Employee employee;
 	private ArrayList<Message> messagesOut = new ArrayList<Message>();
 	private Message message;
 	private int sessionID;
-	private int tellerID;
+	private String employeeUsername;
 	private String tellerPW;
 	private int customerID;
 	private String customerPW;
+	private Boolean tellerType;
 	private Boolean tellerConnected;
 	private Boolean custConnected;
 	private Customer customer;
-	private Message customerMsg;
 	Scanner scan = new Scanner(System.in);
 	OutputStream outputstream;
 	ObjectOutputStream objectOutputStream;
@@ -31,7 +32,7 @@ public class Teller {
 
 	public Teller() throws ClassNotFoundException {
 		sessionID = 0;
-		tellerID = 0;
+		employeeUsername = "";
 		customerID = 0;
 		customerPW = tellerPW = "";
 		tellerConnected = false;
@@ -42,11 +43,12 @@ public class Teller {
 			socket = new Socket("localhost", 1234);
 			outputstream = socket.getOutputStream();
 			objectOutputStream = new ObjectOutputStream(outputstream);
-
-			while (true) {
-				makeConnection();
-				accessCustomer();
-			}
+			inputstream = socket.getInputStream();
+			objectInputStream = new ObjectInputStream(inputstream);
+//			while (true) {
+//				makeConnection();
+//				accessCustomer();
+//			}
 		} catch (UnknownHostException u) {
 			System.out.println(u);
 		} catch (IOException i) {
@@ -56,8 +58,8 @@ public class Teller {
 
 	public void makeConnection() throws IOException, ClassNotFoundException {
 		while (!tellerConnected) {
-			System.out.println("Enter Employee Account ID: ");
-			tellerID = Integer.parseInt(scan.nextLine());
+			System.out.println("Enter Employee Username: ");
+			employeeUsername = scan.nextLine();
 
 			System.out.println("Enter Employee Password: ");
 			tellerPW = scan.nextLine();
@@ -92,10 +94,6 @@ public class Teller {
 			CustomerAccess cAccess = new CustomerAccess(sessionID, "Passcode", customerID);
 			objectOutputStream.writeObject(cAccess);
 
-			// Receive server response
-			inputstream = socket.getInputStream();
-			objectInputStream = new ObjectInputStream(inputstream);
-
 			CustomerAccess receive = (CustomerAccess) objectInputStream.readObject();
 
 			custConnected = receive.success;
@@ -109,7 +107,7 @@ public class Teller {
 		socket.close();
 	}
 
-	public Money money(double amount) {
+	public Money convertMoney(double amount) {
 		String[] amt = String.valueOf(amount).split("\\.");
 		int[] dollars = new int[2];
 		dollars[0] = Integer.parseInt(amt[0]);
@@ -131,7 +129,7 @@ public class Teller {
 				int acc = scan.nextInt();
 				System.out.println("Enter Amount: ");
 				double depositAmt = Double.parseDouble(scan.nextLine());
-				Money money = money(depositAmt);
+				Money money = convertMoney(depositAmt);
 				TellerDeposit tDeposit = new TellerDeposit(customer, sessionID, money, acc);
 				objectOutputStream.writeObject(tDeposit);
 
@@ -149,7 +147,7 @@ public class Teller {
 				int acc = scan.nextInt();
 				System.out.println("Enter Amount: ");
 				double withdrawAmt = Double.parseDouble(scan.nextLine());
-				Money money = money(withdrawAmt);
+				Money money = convertMoney(withdrawAmt);
 				TellerWithdrawal tWithdraw = new TellerWithdrawal(customer, sessionID, money, acc);
 				objectOutputStream.writeObject(tWithdraw);
 
@@ -169,7 +167,7 @@ public class Teller {
 				int tAcc = scan.nextInt();
 				System.out.println("Enter Amount: ");
 				double transferAmt = Double.parseDouble(scan.nextLine());
-				Money money = money(transferAmt);
+				Money money = convertMoney(transferAmt);
 				TellerTransfer tTransfer = new TellerTransfer(customer, sessionID, money, tAcc, acc);
 				objectOutputStream.writeObject(tTransfer);
 
@@ -187,7 +185,7 @@ public class Teller {
 				customer = null;
 				Dismiss dismiss = new Dismiss(sessionID);
 				objectOutputStream.writeObject(dismiss);
-				
+
 				Dismiss dReceive = (Dismiss) objectInputStream.readObject();
 				Boolean dSuccess = dReceive.success;
 				if (dSuccess) {
@@ -198,4 +196,141 @@ public class Teller {
 			}
 		}
 	}
+
+	public Boolean addAccount(Account newAccount) {
+		AddAccount addAccount = new AddAccount(customer, newAccount);
+		objectOutputStream.writeObject(addAccount);
+
+		AddAccount aReceive = (AddAccount) objectInputStream.readObject();
+		if (aReceive.success)
+			customer = aReceive.customer;
+		return aReceive.success;
+	}
+
+	public Boolean removeAccount(String oldAccount) {
+		RemoveAccount removeAccount = new RemoveAccount(customer, sessionID, Integer.parseInt(oldAccount));
+		objectOutputStream.writeObject(removeAccount);
+
+		RemoveAccount rReceive = (RemoveAccount) objectInputStream.readObject();
+		if (rReceive.success)
+			customer = rReceive.customer;
+		return rReceive.success;
+	}
+
+	public Boolean[] login(String username, String password) throws IOException, ClassNotFoundException {
+		TellerLogin tLogin = new TellerLogin(username, password);
+		objectOutputStream.writeObject(tLogin);
+		TellerLogin receive = (TellerLogin) objectInputStream.readObject();
+
+		sessionID = receive.sessionID;
+		tellerConnected = receive.success;
+		tellerType = receive.supervisor;
+
+		Boolean[] arr = { tellerConnected, tellerType };
+		return arr;
+	}
+
+	public CustomerInfo custLogin(String passcode, int custID) throws IOException, ClassNotFoundException {
+		CustomerAccess cAccess = new CustomerAccess(sessionID, passcode, custID);
+		objectOutputStream.writeObject(cAccess);
+		CustomerAccess receive = (CustomerAccess) objectInputStream.readObject();
+
+		custConnected = receive.success;
+		customer = receive.customer;
+		CustomerInfo custInfo = new CustomerInfo(receive.success, receive.customer);
+		return custInfo;
+	}
+
+	public Boolean newCustomer(String name, String username, String password) {
+		NewCustomer newCustomer = new NewCustomer(sessionID, name, password, username);
+		objectOutputStream.writeObject(newCustomer);
+
+		NewCustomer nReceive = (NewCustomer) objectInputStream.readObject();
+
+		return nReceive.success;
+	}
+
+	public Boolean removeCustomer() throws IOException, ClassNotFoundException {
+		RemoveCustomer removeCustomer = new RemoveCustomer(sessionID, customer);
+		objectOutputStream.writeObject(removeCustomer);
+
+		RemoveCustomer rReceive = (RemoveCustomer) objectInputStream.readObject();
+
+		return rReceive.success;
+	}
+
+	public Boolean deposit(String accountNumber, String depositAmount) throws IOException, ClassNotFoundException {
+		Money money = convertMoney(Double.parseDouble(depositAmount));
+		TellerDeposit tDeposit = new TellerDeposit(customer, sessionID, money, Integer.parseInt(accountNumber));
+		objectOutputStream.writeObject(tDeposit);
+
+		TellerDeposit tReceive = (TellerDeposit) objectInputStream.readObject();
+		return tReceive.success;
+	}
+
+	public Boolean withdraw(String accountNumber, String withdrawAmount) throws IOException, ClassNotFoundException {
+		Money money = convertMoney(Double.parseDouble(withdrawAmount));
+		TellerWithdrawal tWithdraw = new TellerWithdrawal(customer, sessionID, money, Integer.parseInt(accountNumber));
+		objectOutputStream.writeObject(tWithdraw);
+
+		TellerWithdrawal tReceive = (TellerWithdrawal) objectInputStream.readObject();
+		return tReceive.success;
+	}
+
+	public Boolean transfer(String fromAccount, String toAccount, String transferAmount)
+			throws IOException, ClassNotFoundException {
+		Money money = convertMoney(Double.parseDouble(transferAmount));
+		TellerTransfer tTransfer = new TellerTransfer(customer, sessionID, money, Integer.parseInt(transferAmount),
+				Integer.parseInt(transferAmount));
+		objectOutputStream.writeObject(tTransfer);
+
+		TellerTransfer tReceive = (TellerTransfer) objectInputStream.readObject();
+
+		return tReceive.success;
+	}
+
+	public Boolean dismiss() throws IOException, ClassNotFoundException {
+		Dismiss dismiss = new Dismiss(sessionID);
+		objectOutputStream.writeObject(dismiss);
+
+		Dismiss rDismiss = (Dismiss) objectInputStream.readObject();
+		return rDismiss.success;
+	}
+
+	public Boolean logout() throws IOException, ClassNotFoundException {
+		Logout logout = new Logout(sessionID);
+		objectOutputStream.writeObject(logout);
+
+		Logout lReceive = (Logout) objectInputStream.readObject();
+		return lReceive.success;
+	}
+
+	public String getBalance(int accountID) {
+		Money balance = customer.findAccount(accountID).getBalance();
+
+		return "" + balance;
+	}
+
+	public Boolean addEmployee(String name, String username, String password, String employeeType)
+			throws IOException, ClassNotFoundException {
+		if (employeeType.toUpperCase() == "EMPLOYEE") {
+			Employee newEmployee = new Employee(name, username, password, EmployeeType.EMPLOYEE);
+			objectOutputStream.writeObject(newEmployee);
+		} else {
+			Employee newEmployee = new Employee(name, username, password, EmployeeType.SUPERVISOR);
+			objectOutputStream.writeObject(newEmployee);
+		}
+
+		Employee eReceive = (Employee) objectInputStream.readObject();
+
+		return eReceive.success;
+	}
+
+	public Boolean removeEmployee(String name, String id) throws IOException, ClassNotFoundException {
+		RemoveEmployee removeEmployee = new RemoveEmployee(name, id);
+		objectOutputStream.writeObject(removeEmployee);
+		
+		RemoveEmployee rReceive = (RemoveEmployee) objectInputStream.readObject();
+		return rReceive.success;
+}
 }
