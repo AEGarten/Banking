@@ -14,12 +14,13 @@ public class Money implements Serializable {
 	//truncates excess digits past the first two after the decimal
 	public Money(double value) {
 		dollars = (int) value;
-		cents = (int) ((value - dollars) * 100.0);
+		String digits = String.format("%.2f", value);
+		digits = digits.split("\\.")[1];	//only keep numbers after decimal
+		cents = Integer.parseInt(digits);
 		
 		if (value < 0) {
 			isPositive = false;			//isPositive true be default
 			dollars *= -1;
-			cents *= -1;
 		}
 	}
 	
