@@ -17,9 +17,9 @@ package banking_dev;
 	 */
 
 public class CustomerAccess extends Message {
-	String passcode = "";
-	int customerID = 0;
-	Customer customer = null;
+	public String passcode = "";
+	public int customerID = 0;
+	public Customer customer = null;
 	
 	//Teller
 	CustomerAccess(int sessionID, String passcode, int customerID){

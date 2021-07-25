@@ -17,7 +17,7 @@ package banking_dev;
  */
 
 public class RemoveCustomer extends Message {
-	int customerID;
+	public int customerID;
 	
 	public RemoveCustomer(Customer customer, int sessionID) {
 		super(sessionID, Process.CLOSE_CUSTOMER);

@@ -19,9 +19,9 @@ import java.util.ArrayList;
  */
 
 public class RemoveEmployee extends Message {
-	int employeeID;
-	String initials;
-	ArrayList<Employee> employeeShortList;
+	public int employeeID;
+	public String initials;
+	public ArrayList<Employee> employeeShortList;
 	
 	//Teller requests short list with matching initials
 	public RemoveEmployee(int sessionID, String initials) {

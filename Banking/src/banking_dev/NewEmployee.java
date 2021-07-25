@@ -17,7 +17,7 @@ package banking_dev;
  */
 
 public class NewEmployee extends Message {
-	Employee employee;
+	public Employee employee;
 	
 	public NewEmployee(Employee employee, int sessionID) {
 		super(sessionID, Process.ADD_EMPLOYEE);
