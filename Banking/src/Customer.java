@@ -37,6 +37,8 @@ public class Customer implements Serializable {
 		this.opened = opened;
 	}
 	
+
+
 	public String getName() { return this.name; }
 	public void setName(String n) { this.name = n; }
 	

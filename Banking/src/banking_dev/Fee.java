@@ -3,9 +3,9 @@ import java.io.Serializable;
 import java.util.Date;
 
 public class Fee implements Serializable {
-	public Money amount;
-	public Date date;
-	public String type;
+	Money amount;
+	Date date;
+	String type;
 
 	public Fee(Date date, Money amount, String type) {
 		this.date = date;

@@ -1,0 +1,21 @@
+4
+Customer,1,Aaron Garten,1,1,2,6/5/2021,not closed,1234,1100
+Savings,11,20.53,1,123456,Fri Jul 08 16/06/34 PDT 3921,Withdrawal,50.32,25.03,Fri Jul 08 16:06:34 PDT 3921,not closed
+Fee,Fri Jul 08 16:06:34 PDT 3921,8.78,Overdraft
+Checking,12,33.82,0,123456,Fri Jul 08 16/06/34 PDT 3921,Deposit,33.82,33.82,Fri Jul 08 16:06:34 PDT 3921,not closed
+Fee,Fri Jul 08 16:06:34 PDT 3921,25.00,Overdraft
+Customer,2,Dolu Odumosu,1,1,2,6/5/2021,not closed,1234,1100
+Savings,13,20.53,1,123456,Fri Jul 08 16/06/34 PDT 3921,Withdrawal,50.32,25.03,Fri Jul 08 16:06:34 PDT 3921,not closed
+Fee,Fri Jul 08 16:06:34 PDT 3921,8.78,Overdraft
+Checking,14,33.82,0,123456,Fri Jul 08 16/06/34 PDT 3921,Deposit,33.82,33.82,Fri Jul 08 16:06:34 PDT 3921,not closed
+Fee,Fri Jul 08 16:06:34 PDT 3921,25.00,Overdraft
+Customer,3,Seth Omoke-Enyi,1,1,2,6/5/2021,not closed,1234,1100
+Savings,13,20.53,1,123456,Fri Jul 08 16/06/34 PDT 3921,Withdrawal,50.32,25.03,Fri Jul 08 16:06:34 PDT 3921,not closed
+Fee,Fri Jul 08 16:06:34 PDT 3921,8.78,Overdraft
+Checking,14,33.82,0,123456,Fri Jul 08 16/06/34 PDT 3921,Deposit,33.82,33.82,Fri Jul 08 16:06:34 PDT 3921,not closed
+Fee,Fri Jul 08 16:06:34 PDT 3921,25.00,Overdraft
+Customer,4,Johnny Depp,1,1,2,6/5/2021,not closed,1234,1100
+Savings,13,20.53,1,123456,Fri Jul 08 16/06/34 PDT 3921,Withdrawal,50.32,25.03,Fri Jul 08 16:06:34 PDT 3921,not closed
+Fee,Fri Jul 08 16:06:34 PDT 3921,8.78,Overdraft
+Checking,14,33.82,0,123456,Fri Jul 08 16/06/34 PDT 3921,Deposit,33.82,33.82,Fri Jul 08 16:06:34 PDT 3921,not closed
+Fee,Fri Jul 08 16:06:34 PDT 3921,25.00,Overdraft
