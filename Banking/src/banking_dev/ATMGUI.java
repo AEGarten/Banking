@@ -135,10 +135,13 @@ public class ATMGUI {
 	}
 	
 	public ATM logout(ATM atm) throws IOException, ClassNotFoundException{
-		boolean success = false;
+		//boolean success = false;
 		success = atm.logout(success);
 		if(success == true) {
 			JOptionPane.showMessageDialog(null, "Logout successful");
+		}
+		else {
+			JOptionPane.showMessageDialog(null, "Logout not successful");
 		}
 		
 		return atm;
