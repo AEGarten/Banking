@@ -2,7 +2,7 @@
 *.class
 
 # Test drivers
-testdrivers/
+*test*driver*/
 
 # Mac temp files
 *.DS_Store
