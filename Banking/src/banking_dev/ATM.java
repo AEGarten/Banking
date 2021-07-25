@@ -44,13 +44,15 @@ public class ATM {
 	
 	
 	
-	public boolean login(String ATMID, String ATMpin) throws UnknownHostException, IOException, ClassNotFoundException {
+	public boolean login(String ATMID, String ATMpin, ObjectOutputStream objectOutputStream, ObjectInputStream inputStream) throws UnknownHostException, IOException, ClassNotFoundException {
 		
-		socketconnection = new Socket("localhost", 1234);
+		//socketconnection = new Socket("localhost", 1234);
 		
 		String operation = "Login";
 		ATMLogin login = new ATMLogin(567890, 1234);
-		ATMLogin atmlogin = (ATMLogin) talkToServer(login, operation);
+		objectOutputStream.writeObject(login);
+		ATMLogin atmlogin = (ATMLogin) inputStream.readObject();
+		//ATMLogin atmlogin = (ATMLogin) talkToServer(login, operation);
 		checkingID = atmlogin.checkingID;
 		savingsID = atmlogin.savingsID;
 		checkingPositive = atmlogin.checkingPositive;
@@ -61,100 +63,36 @@ public class ATM {
 		return GUImessage;
 	}
 	
-	public Message talkToServer(Message message, String operation) throws SocketException {
-		Message loginmessage = null;
-		Message logoutmessage = null;
-		try {
-			OutputStream outputStream = socketconnection.getOutputStream();
-			ObjectOutputStream objectOutputStream = new ObjectOutputStream(outputStream);
-			ObjectInputStream inputStream = new ObjectInputStream(socketconnection.getInputStream());
-			objectOutputStream.writeObject(message);
-				while (inputStream.available() > 0) {
-					if (operation.equalsIgnoreCase("Login")) {
-						loginmessage = (ATMLogin) inputStream.readObject();
-						return loginmessage;
-					}
-					if (operation.equalsIgnoreCase("Logout")) {
-						logoutmessage = (Logout) inputStream.readObject();
-						return logoutmessage;
-					}
-					if (operation.equalsIgnoreCase("Deposit")) {
-						//returnmessage = (ATMDeposit) inputStream.readObject();
-					}
-					if (operation.equalsIgnoreCase("Withdrawal")) {
-						//returnmessage = (ATMWithdrawal) inputStream.readObject();
-					}
-					if (operation.equalsIgnoreCase("Transfer")) {
-						//returnmessage = (ATMTransfer) inputStream.readObject();
-					}
-					if (operation.equalsIgnoreCase("View Balance")) {
-						//returnmessage = (Balance) inputStream.readObject();
-					}
-					//outputStream.close();
-					//objectOutputStream.reset();
-					//inputStream.reset();
-				}
-			} 
-			
-			catch (ClassNotFoundException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			} catch (EOFException e) {
-				
-			} catch (IOException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
-		
-		return loginmessage;
-	}
 	
-	public boolean deposit(String source, String depositamount, boolean success) throws IOException, ClassNotFoundException {
-		Money amount = new Money();
-		amount.setDollars(Integer.parseInt(depositamount));
-		amount.setCents(0);
+	public boolean deposit(String source, String depositamount, boolean success, ObjectOutputStream objectOutputstream, ObjectInputStream inputStream) throws IOException, ClassNotFoundException {
+		Money amount = new Money(Double.parseDouble(depositamount));
 		
 		ATMDeposit deposit = null;
 		if(source.equalsIgnoreCase("Checking")) {
-			deposit = new ATMDeposit(sessionID, amount, user.getCheckingID());
+			deposit = new ATMDeposit(sessionID, amount, checkingID);
 		}
 		
 		else if(source.equalsIgnoreCase("Savings")) {
-			deposit = new ATMDeposit(sessionID, amount, user.getSavingsID());
+			deposit = new ATMDeposit(sessionID, amount, savingsID);
 		}
-		
-		try {
-			OutputStream outputStream = socketconnection.getOutputStream();
-			ObjectOutputStream objectOutputStream = new ObjectOutputStream(outputStream);
-			objectOutputStream.writeObject(deposit);
-			
-			ObjectInputStream inputStream = new ObjectInputStream(socketconnection.getInputStream());
-			ATMDeposit atmdeposit = (ATMDeposit) inputStream.readObject();
-			GUImessage = atmdeposit.success;
-		} catch (ClassNotFoundException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (EOFException e) {
-			
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-		
+		objectOutputstream.writeObject(deposit);
+		ATMDeposit atmdeposit = (ATMDeposit) inputStream.readObject();
+		GUImessage = atmdeposit.success;
+
 		return GUImessage;
 	}
 	
-	public boolean withdrawal(String withdrawalsource, String withdrawalamount, boolean success) throws IOException, ClassNotFoundException {
+	public boolean withdrawal(String withdrawalsource, String withdrawalamount, boolean success, ObjectOutputStream objectOutputstream, ObjectInputStream inputStream) throws IOException, ClassNotFoundException {
 		Money amount = new Money();
 		amount.setDollars(Integer.parseInt(withdrawalamount));
 		amount.setCents(0);
 		
 		ATMWithdrawal withdrawal = null;
 		if(withdrawalsource.equalsIgnoreCase("Checking") & checkingPositive == true) {
-			withdrawal = new ATMWithdrawal(sessionID, amount,  user.getCheckingID());
+			withdrawal = new ATMWithdrawal(sessionID, amount,  checkingID);
 		}
 		else if(withdrawalsource.equalsIgnoreCase("Savings") & savingsPositive == true) {
-			withdrawal = new ATMWithdrawal(sessionID, amount,  user.getSavingsID());
+			withdrawal = new ATMWithdrawal(sessionID, amount,  savingsID);
 		}
 		else if(withdrawalsource.equalsIgnoreCase("Checking") & checkingPositive == false) {
 			GUImessage = false;
@@ -164,30 +102,16 @@ public class ATM {
 			GUImessage = false;
 			return GUImessage;
 		}
-		
-		try {
-			OutputStream outputStream = socketconnection.getOutputStream();
-			ObjectOutputStream objectOutputStream = new ObjectOutputStream(outputStream);
-			objectOutputStream.writeObject(withdrawal);	
 			
-			ObjectInputStream inputStream = new ObjectInputStream(socketconnection.getInputStream());
-			ATMWithdrawal atmwithdrawal = (ATMWithdrawal) inputStream.readObject();
-			GUImessage = atmwithdrawal.success;
-		} catch (ClassNotFoundException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (EOFException e) {
-			
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-		
+		objectOutputstream.writeObject(withdrawal);
+		ATMWithdrawal atmwithdrawal = (ATMWithdrawal) inputStream.readObject();
+		GUImessage = atmwithdrawal.success;
+
 		return GUImessage;
 	}
 	
 	
-	public boolean transferFunds(String transfersource, String transfertarget, String transferamount, boolean success) throws IOException, ClassNotFoundException {
+	public boolean transferFunds(String transfersource, String transfertarget, String transferamount, boolean success, ObjectOutputStream objectOutputstream, ObjectInputStream inputStream) throws IOException, ClassNotFoundException {
 		int sourceID = 0;
 		
 		Money amount = new Money();
@@ -197,11 +121,11 @@ public class ATM {
 		ATMTransfer transfer = null;
 		if(transfersource.equalsIgnoreCase("Checking") & checkingPositive == true) {
 			sourceID = user.getCheckingID();
-			transfer = new ATMTransfer(sessionID, amount, Integer.parseInt(transfertarget), sourceID);
+			transfer = new ATMTransfer(sessionID, amount, Integer.parseInt(transfertarget), checkingID);
 		}
 		else if(transfersource.equalsIgnoreCase("Savings") & savingsPositive == true) {
 			sourceID = user.getSavingsID();
-			transfer = new ATMTransfer(sessionID, amount, Integer.parseInt(transfertarget), sourceID);
+			transfer = new ATMTransfer(sessionID, amount, Integer.parseInt(transfertarget), savingsID);
 		}
 		else if(transfersource.equalsIgnoreCase("Checking") & checkingPositive == false) {
 			GUImessage = false;
@@ -212,58 +136,28 @@ public class ATM {
 			return GUImessage;
 		}
 		
-		
-		
-		try {
-			OutputStream outputStream = socketconnection.getOutputStream();
-			ObjectOutputStream objectOutputStream = new ObjectOutputStream(outputStream);
-			objectOutputStream.writeObject(transfer);
 			
-			ObjectInputStream inputStream = new ObjectInputStream(socketconnection.getInputStream());
-			ATMTransfer atmtransfer = (ATMTransfer) inputStream.readObject();
-			GUImessage = atmtransfer.success;
-		} catch (ClassNotFoundException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (EOFException e) {
-			
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-		
+		objectOutputstream.writeObject(transfer);
+		ATMTransfer atmtransfer = (ATMTransfer) inputStream.readObject();
+		GUImessage = atmtransfer.success;
 		return GUImessage;
 		
 	}
 	
-	public Balance viewBalance(String balanceaccount, boolean success) throws IOException, ClassNotFoundException {
+	public Balance viewBalance(String balanceaccount, boolean success, ObjectOutputStream objectOutputstream, ObjectInputStream inputStream) throws IOException, ClassNotFoundException {
 		Balance balance = null;
 		if(balanceaccount.equalsIgnoreCase("Checking")) {
-			balance = new Balance(sessionID, user.getCheckingID());
+			balance = new Balance(sessionID, checkingID);
 		}
 		else if(balanceaccount.equalsIgnoreCase("Savings")) {
-			balance = new Balance(sessionID, user.getSavingsID());
+			balance = new Balance(sessionID, savingsID);
 		}
 		
 		
-		Balance atmbalance = null;
-		try {
-			OutputStream outputStream = socketconnection.getOutputStream();
-			ObjectOutputStream objectOutputStream = new ObjectOutputStream(outputStream);
-			objectOutputStream.writeObject(balance);
-			
-			ObjectInputStream inputStream = new ObjectInputStream(socketconnection.getInputStream());
-			atmbalance = (Balance) inputStream.readObject();
-		} catch (ClassNotFoundException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (EOFException e) {
-			
-		} 
-		catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
+		
+		objectOutputstream.writeObject(balance);
+		Balance atmbalance = (Balance) inputStream.readObject();
+	
 		return atmbalance;
 	}
 	
@@ -275,11 +169,13 @@ public class ATM {
 		// I know it needs to be here but I dont really know how it will be implemented
 	}
 	
-	public boolean logout(boolean success) throws IOException, ClassNotFoundException {
+	public boolean logout(boolean success, ObjectOutputStream objectOutputstream, ObjectInputStream inputStream) throws IOException, ClassNotFoundException {
 		Logout logout = null;
 		String operation = "Logout";
 		logout = new Logout(sessionID);
-		Logout atmlogout = (Logout) talkToServer(logout, operation);	
+		objectOutputstream.writeObject(logout);
+		Logout atmlogout = (Logout) inputStream.readObject();
+		//Logout atmlogout = (Logout) talkToServer(logout, operation);	
 		GUImessage = atmlogout.success;
 		
 		
