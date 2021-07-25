@@ -14,8 +14,11 @@ public class DataBase {
 	private UniqueIDs accountIDs = new UniqueIDs();
 	private UniqueIDs employeeIDs = new UniqueIDs();
 	
-	private ArrayList<Customer> customers = new ArrayList<>();
+	private ArrayList<Customer> customers;
 	private ArrayList<Employee> employees = new ArrayList<>();
+	private EmployeeHandler employeeFile;
+	private CustomerFileHandler customerFile = new CustomerFileHandler("CustomerFile.csv");
+	private boolean dataBaseLoaded;
 	
 	//maps cards to their Customers, more efficient than searching each Customer then each Acct
 	private HashMap<Integer, Integer> cardToCustomerTable = new HashMap<>();
@@ -24,69 +27,22 @@ public class DataBase {
 	private ConcurrentHashMap<String, Integer> loginToIDTable = new ConcurrentHashMap<>();
 	
 	public DataBase() {
-		//TODO remove hardcoding after FileManager added
-		cardToCustomerTable.put(567890, 4543);
-		
-		accountIDs.addID(92837);
-		accountIDs.addID(92840);
-		
-		Account check = new Account(92837, AccountType.CHECKING);
-		check.setBalance(new Money(23, 16, true));
-		check.setAttachedCard(true);
-		check.setCardID(567890);
-		check.addFee(overdraftFee);
-		check.addFee(overdraftFee);
-		
-		Account check2 = new Account(92840, AccountType.CHECKING);
-		check2.setBalance(new Money(1000, 16, true));
-		
-		Account sav = new Account(52704706, AccountType.SAVINGS);
-		sav.setBalance(new Money(100, 01, true));
-		sav.setAttachedCard(true);
-		sav.setCardID(567890);
-		sav.addFee(overdraftFee);
-		
-		Customer cust = new Customer(4543, "Aidan Chartreuse");
-		cust.setPIN(1234);
-		cust.setPasscode("Passcode");
-		cust.addAccount(check);
-		cust.addAccount(sav);
-		cust.addAccount(check2);
-		cust.setNumChecking(2);
-		cust.setNumSavings(0);
-		addCustomer(cust);
-		
-		cust = new Customer(
-				444, "Sam Johnson", 
-				"secret", 2, 
-				0, 0, 
-				new Date(System.currentTimeMillis() - 7*24*3600_000));
-		LastTransaction lTrans = new LastTransaction(new Money(1261.00), new Money(-60.40), "teller withdrawal");
-		sav = new Account(
-				34, AccountType.SAVINGS, 
-				new Money(1200.60), lTrans, 
-				new Date(System.currentTimeMillis() - 5*24*3600_000), false, 
-				0);
-		cust.addAccount(sav);
-		lTrans = new LastTransaction(new Money(0.01), new Money(6.00), "teller deposit");
-		sav = new Account(
-				39, AccountType.SAVINGS, 
-				new Money(6.01), lTrans, 
-				new Date(System.currentTimeMillis() - 24*3600_000), false, 
-				0);
-		cust.addAccount(sav);
-		addCustomer(cust);
-		
+			
+		//TODO remove hard coding when employee file loader complete
 		Employee employee = new Employee("C. Smith", 197, "Login", "Password");
 		addEmployee(employee);
 		
 		employee = new Employee("Dave S.", 297, "Better, faster, stronger", "Passw0rd");
 		employee.setType(EmployeeType.SUPERVISOR);
 		addEmployee(employee);
+		
+		dataBaseLoaded = loadData();
 	}
 	
 	public Fee getOverdraftFee() {return this.overdraftFee; }
 	public void setOverdraftFee(Fee f) { this.overdraftFee = f; }
+	
+	public boolean isDataBaseLoaded() { return this.dataBaseLoaded; }
 	
 	public int getCustomerFromCard(int cardNum) {
 		if (cardToCustomerTable.containsKey(cardNum)) 
@@ -102,7 +58,7 @@ public class DataBase {
 	
 	public synchronized Customer findCustomer(int custID) {
 		int foundIndex;
-		Customer key = new Customer(custID, null);
+		Customer key = new Customer("name", "passcode");
 			
 		foundIndex = Collections.binarySearch(customers, key, 
 			(a, b) -> a.getID() - b.getID());		
@@ -202,6 +158,13 @@ public class DataBase {
 		return true;
 	}
 	
+	public boolean saveCustomers() {
+		return customerFile.save(customers);
+	}
 	
+	public boolean loadData() {
+		customers = customerFile.parse();
+		return customers != null;
+	}
 	
 }

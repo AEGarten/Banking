@@ -13,13 +13,14 @@ public class Account implements Serializable {
 	private Date opened = new Date();
 	private Date closed;
 	private boolean attachedCard = false;  //is there an ATM assoc w this account
-	private int cardID;						//if so what is the card id
+	private int cardID = 0;						//if so what is the card id
 
 	private ArrayList<Fee> fees = new ArrayList<>();	
 	
-	public Account(int id, AccountType at) {
-		this.id = id;
+	public Account(AccountType at, Money balance) {
+		this.id = 0;
 		this.type = at;
+		this.balance = balance;
 	}
 	
 	//full constructor for loading from file; collections can be set separately 
@@ -29,7 +30,8 @@ public class Account implements Serializable {
 			Date opened, boolean attCard, 
 			int cardID) {
 		
-		this(id, accountType);
+		this.id = id;
+		this.type = accountType;
 		this.balance = balance;
 		this.lastTransaction = lastTransaction;
 		this.opened = opened;

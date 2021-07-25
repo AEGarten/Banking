@@ -18,9 +18,10 @@ public class Customer implements Serializable {
 	//TODO cardConnected boolean, hashmap of cards to id, delete card to customer table fr db
 	
 	
-	public Customer(int id, String name) {
-		this.id = id;
+	public Customer(String name, String passcode) {
+		this.id = 0;
 		this.name = name;
+		this.passcode = passcode;
 	}
 	
 	//full constructor for loading from file; collections can be set separately
@@ -30,7 +31,7 @@ public class Customer implements Serializable {
 			int numChecking, int PIN, 
 			Date opened) {
 		
-		this(id, name);
+		this(name, passcode);
 		this.passcode = passcode;
 		this.numSavings = numSavings;
 		this.numChecking = numChecking;
@@ -46,12 +47,6 @@ public class Customer implements Serializable {
 	public String getPasscode() { return this.passcode; }
 	public void setPasscode(String p) { this.passcode = p; }
 	
-	public int getNumSavings() { return this.numSavings; }
-	public void setNumSavings(int n) { this.numSavings = n; }
-	
-	public int getNumChecking() { return this.numChecking; }
-	public void setNumChecking(int n) { this.numChecking = n; }
-	
 	public Date getOpened() { return this.opened; }
 	public void setOpened(Date d) { this.opened = d; }
 	
@@ -61,12 +56,28 @@ public class Customer implements Serializable {
 	public int getPIN() { return this.PIN; }
 	public void setPIN(int PIN) { this.PIN = PIN; }
 	
-	public int getID() { return this.id; }
-	
 	public ArrayList<Account> getAccounts() { return this.accounts; }
 	public void setAccounts(ArrayList<Account> a) { this.accounts = a; }
 	
 	public void addAccount(Account a) { this.accounts.add(a); }
+	
+	public int getID() { return this.id; }
+	
+	public int getNumSavings() { 
+		int num = 0;
+		for (Account account: accounts) {
+			if (account.getType() == AccountType.SAVINGS) num += 1;
+		}
+		return num; 
+	}
+	
+	public int getNumChecking() { 
+		int num = 0;
+		for (Account account: accounts) {
+			if (account.getType() == AccountType.CHECKING) num += 1;
+		}
+		return num;  
+	}
 	
 	public Account findAccount(int id) {
 		for (Account a: this.accounts) {
