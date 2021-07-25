@@ -138,12 +138,37 @@ public class Server {
 						}
 						else closeConnection = true;	//no login, no valid sessionID, close connection
 					}
-					//by now should be valid, if not send msgIn back (already has msg.success==false)
 					if (validated) {
-						System.out.println("Client "+ sessionID +" attempting: "+ msgIn.perform);
 						switch(msgIn.perform) {
 						
 						case LOGOUT: msgOut = logout((Logout) msgIn); break;
+						
+	//					case SAVE: {
+//							if (!online) {
+								//TODO make save operation
+//							}
+//							else msgOut = Save(msgIn, "Server Online, Save disabled");
+//						} break;						
+						
+//						case ONLINE: {
+//							if (db.isDataBaseLoaded()) {	//success
+//								online = true;
+//								msgOut = new Online(msgIn);
+//							}
+//							else msgOut = new Online(msgIn, "data base failed to load");	//fail
+//						} break;
+						
+						default: break;
+						}
+					}
+					
+					
+					//by now should be valid, if not send msgIn back (already has msg.success as false)
+					if (validated && online) {
+						System.out.println("Client "+ sessionID +" attempting: "+ msgIn.perform);
+						switch(msgIn.perform) {
+						
+						
 						
 						case CUSTOMER_ACCESS: msgOut = customerAccess((CustomerAccess) msgIn); break;
 
@@ -170,26 +195,23 @@ public class Server {
 
 	//					case DIVIDEND:
 	//						break;
-	//					case LOAD:
-	//						break;
 
 	//					case NEW_CUSTOMER:
 	//						break;
-	//					case ONLINE:
-	//						break;
+
 	//					case REMOVE_EMPLOYEE:
 	//						break;
-	//					case SAVE:
-	//						break;
-	//					case SHUTDOWN:
-	//						break;
+
+//						case SHUTDOWN: {
+//							msgOut = new Shutdown(msgIn, true);
+//							online = false;
+//						} break;
+						
 						case TRANSFER: {
 							if (msgIn instanceof ATMTransfer) msgOut = atmTransfer((ATMTransfer) msgIn);
 							else msgOut = tellerTransfer((TellerTransfer) msgIn);
 						} break;
 						
-	//					case TRANSFER_TOCUSTOMER:
-	//						break;
 						case WITHDRAWAL: {
 							if (msgIn instanceof ATMWithdrawal) msgOut = atmWithdrawal((ATMWithdrawal) msgIn);
 							else msgOut = tellerWithdrawal((TellerWithdrawal) msgIn);
@@ -201,7 +223,7 @@ public class Server {
 						}
 					}
 					
-					else toClient.writeObject(new Message (msgIn, "login failed"));
+					else msgOut = new Message (msgIn, "Validation failed or Server not Online");
 					
 					toClient.writeObject(msgOut);
 				}

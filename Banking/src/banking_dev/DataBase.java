@@ -16,6 +16,9 @@ public class DataBase {
 	
 	private ArrayList<Customer> customers = new ArrayList<>();
 	private ArrayList<Employee> employees = new ArrayList<>();
+	private EmployeeHandler employeeFile;
+//	private CustomerHandler customerFile;	//TODO make file loader for customers
+	private boolean dataBaseLoaded;
 	
 	//maps cards to their Customers, more efficient than searching each Customer then each Acct
 	private HashMap<Integer, Integer> cardToCustomerTable = new HashMap<>();
@@ -81,10 +84,14 @@ public class DataBase {
 		employee = new Employee("Dave S.", 297, "Better, faster, stronger", "Passw0rd");
 		employee.setType(EmployeeType.SUPERVISOR);
 		addEmployee(employee);
+		
+		dataBaseLoaded = true;
 	}
 	
 	public Fee getOverdraftFee() {return this.overdraftFee; }
 	public void setOverdraftFee(Fee f) { this.overdraftFee = f; }
+	
+	public boolean isDataBaseLoaded() { return this.dataBaseLoaded; }
 	
 	public int getCustomerFromCard(int cardNum) {
 		if (cardToCustomerTable.containsKey(cardNum)) 
