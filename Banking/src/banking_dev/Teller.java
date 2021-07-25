@@ -314,10 +314,10 @@ public class Teller {
 	public Boolean addEmployee(String name, String username, String password, String employeeType)
 			throws IOException, ClassNotFoundException {
 		if (employeeType.toUpperCase() == "EMPLOYEE") {
-			Employee newEmployee = new Employee(name, username, password, EmployeeType.EMPLOYEE);
+			NewEmployee newEmployee = new NewEmployee(name, username, password, EmployeeType.EMPLOYEE);
 			objectOutputStream.writeObject(newEmployee);
 		} else {
-			Employee newEmployee = new Employee(name, username, password, EmployeeType.SUPERVISOR);
+			NewEmployee newEmployee = new NewEmployee(name, username, password, EmployeeType.SUPERVISOR);
 			objectOutputStream.writeObject(newEmployee);
 		}
 
@@ -329,8 +329,8 @@ public class Teller {
 	public Boolean removeEmployee(String name, String id) throws IOException, ClassNotFoundException {
 		RemoveEmployee removeEmployee = new RemoveEmployee(name, id);
 		objectOutputStream.writeObject(removeEmployee);
-		
+
 		RemoveEmployee rReceive = (RemoveEmployee) objectInputStream.readObject();
 		return rReceive.success;
-}
+	}
 }
