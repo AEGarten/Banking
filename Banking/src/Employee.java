@@ -22,6 +22,13 @@ public class Employee implements Serializable {
 		this.loginusername = loginusername;
 		this.loginpwd = loginpwd;
 	}
+	
+	public Employee(String name, String loginusername, String loginpwd, EmployeeType type) {
+		this.name = name;
+		this.loginusername = loginusername;
+		this.loginpwd = loginpwd;
+		this.type = type;
+	}
 
 	public String getName() {return name;}
 	public void setName(String name) {this.name = name;}
