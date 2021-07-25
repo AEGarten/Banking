@@ -517,9 +517,12 @@ public class TellerGUI {
 	public void newCustomer() throws IOException, ClassNotFoundException {
 		String name = JOptionPane.showInputDialog(frame, "Enter Name:", "Name", JOptionPane.INFORMATION_MESSAGE);
 		String username = JOptionPane.showInputDialog(frame, "Enter Username:", "Username", JOptionPane.INFORMATION_MESSAGE);
-		String password = JOptionPane.showInputDialog(frame, "Enter Password:", "Password",
+		String passcode = JOptionPane.showInputDialog(frame, "Enter Passcode:", "Passcode",
 				JOptionPane.INFORMATION_MESSAGE);
-		Boolean success = teller.newCustomer(name, username, password);
+		String numSavings = JOptionPane.showInputDialog(frame, "Enter Number of Savings:", "Number of Savings", JOptionPane.INFORMATION_MESSAGE);
+		String numChecking = JOptionPane.showInputDialog(frame, "Enter Number of Checking:", "Number of Checking", JOptionPane.INFORMATION_MESSAGE);
+		String PIN = JOptionPane.showInputDialog(frame, "Enter PIN:", "PIN", JOptionPane.INFORMATION_MESSAGE);
+		Boolean success = teller.newCustomer(name, username, passcode, numSavings, numChecking, Integer.parseInt(PIN));
 		if (success) {
 			JOptionPane.showMessageDialog(frame, "Customer Successfully Created");
 			userName.setText("Name:" + name);

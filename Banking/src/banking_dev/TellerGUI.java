@@ -1,4 +1,5 @@
 package banking_dev;
+
 import javax.swing.*;
 
 import java.awt.Dimension;
@@ -453,7 +454,7 @@ public class TellerGUI {
 				}
 			}
 		});
-		
+
 		// Remove employee button
 		JButton removeEmployeeButton = new JButton("Remove Employee");
 		removeEmployeeButton.addActionListener(new ActionListener() {
@@ -469,7 +470,7 @@ public class TellerGUI {
 				}
 			}
 		});
-		
+
 		supervisorPanel.add(supervisorBox);
 		frame.setVisible(true);
 		frame.pack();
@@ -511,16 +512,27 @@ public class TellerGUI {
 
 			cust = teller.custLogin(password, Integer.parseInt(ID));
 			success = cust.bool;
-			
+
 		}
 	}
 
 	public void newCustomer() throws IOException, ClassNotFoundException {
 		String name = JOptionPane.showInputDialog(frame, "Enter Name:", "Name", JOptionPane.INFORMATION_MESSAGE);
-		String username = JOptionPane.showInputDialog(frame, "Enter Username:", "Username", JOptionPane.INFORMATION_MESSAGE);
-		String password = JOptionPane.showInputDialog(frame, "Enter Password:", "Password",
+		if (name == null)
+			return;
+		String passcode = JOptionPane.showInputDialog(frame, "Enter Passcode:", "Passcode",
 				JOptionPane.INFORMATION_MESSAGE);
-		Boolean success = teller.newCustomer(name, username, password);
+		if (passcode == null)
+			return;
+		String numSavings = JOptionPane.showInputDialog(frame, "Enter Number of Savings:", "Number of Savings",
+				JOptionPane.INFORMATION_MESSAGE);
+		if (numSavings == null)
+			return;
+		String numChecking = JOptionPane.showInputDialog(frame, "Enter Number of Checking:", "Number of Checking",
+				JOptionPane.INFORMATION_MESSAGE);
+		if (numChecking == null)
+			return;
+		Boolean success = teller.newCustomer(name, passcode, Integer.parseInt(numSavings), Integer.parseInt(numChecking));
 		if (success) {
 			JOptionPane.showMessageDialog(frame, "Customer Successfully Created");
 			userName.setText("Name:" + name);
@@ -634,22 +646,25 @@ public class TellerGUI {
 
 	public void addEmployee() throws IOException, ClassNotFoundException {
 		String name = JOptionPane.showInputDialog(frame, "Enter Name:", "Name", JOptionPane.INFORMATION_MESSAGE);
-		String username = JOptionPane.showInputDialog(frame, "Enter username:", "Username", JOptionPane.INFORMATION_MESSAGE);
+		String username = JOptionPane.showInputDialog(frame, "Enter username:", "Username",
+				JOptionPane.INFORMATION_MESSAGE);
 		String password = JOptionPane.showInputDialog(frame, "Enter Password:", "Password",
 				JOptionPane.INFORMATION_MESSAGE);
 		String employeeType = JOptionPane.showInputDialog(frame, "Enter Employee Type:", "Employee Type",
 				JOptionPane.INFORMATION_MESSAGE);
 		Boolean success = teller.addEmployee(name, username, password, employeeType);
-		if (success) JOptionPane.showMessageDialog(frame, "Successfully Added Employe: " + name);
+		if (success)
+			JOptionPane.showMessageDialog(frame, "Successfully Added Employe: " + name);
 	}
 
 	public void removeEmployee() throws IOException, ClassNotFoundException {
 		String name = JOptionPane.showInputDialog(frame, "Enter Name:", "Name", JOptionPane.INFORMATION_MESSAGE);
 		String ID = JOptionPane.showInputDialog(frame, "Enter ID:", "ID", JOptionPane.INFORMATION_MESSAGE);
-		Boolean success = teller.removeEmployee(name,ID);
-		if (success) JOptionPane.showMessageDialog(frame, "Successfully Removed Employee: " + name);
+		Boolean success = teller.removeEmployee(name, ID);
+		if (success)
+			JOptionPane.showMessageDialog(frame, "Successfully Removed Employee: " + name);
 	}
-	
+
 	public void getBalance(String accountNumber) {
 		String displayBalance = teller.getBalance(Integer.parseInt(accountNumber));
 		balanceDisplay.setText(displayBalance);

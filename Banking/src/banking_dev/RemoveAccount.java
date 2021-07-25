@@ -16,26 +16,25 @@ package banking_dev;
  * +Message(Message, why)			//server: fail
  */
 
-public class AddAccount extends Message {
-	public Account account;
-	public int customerID;
-	public Customer customer;
+public class RemoveAccount extends Message {
+	int customerID;
+	int accountID;
+	Customer customer;
 	
-	public AddAccount(Customer customer, int sessionID, Account account) {
-		super(sessionID, Process.ADD_ACCOUNT);
-		
-		this.account = account;
+	public RemoveAccount(Customer customer, int sessionID, Account acct) {
+		super(sessionID, Process.CLOSE_ACCOUNT);
 		customerID = customer.getID();
+		accountID = acct.getID();
 	}
 	
 	//Server use, success
-	public AddAccount(Message m, Customer customer) {
+	public RemoveAccount(Message m, Customer c) {
 		super(m, true);
-		this.customer = customer;
+		customer = c;
 	}
 	
 	//Server use, fail
-	public AddAccount(Message m, String why) {
+	public RemoveAccount(Message m, String why) {
 		super(m, why);
 	}
 }
