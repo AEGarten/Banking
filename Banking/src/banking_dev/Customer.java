@@ -18,8 +18,8 @@ public class Customer implements Serializable {
 	//TODO cardConnected boolean, hashmap of cards to id, delete card to customer table fr db
 	
 	
-	public Customer(int id, String name, String passcode) {
-		this.id = id;
+	public Customer(String name, String passcode) {
+		this.id = 0;
 		this.name = name;
 		this.passcode = passcode;
 	}
@@ -31,7 +31,7 @@ public class Customer implements Serializable {
 			int numChecking, int PIN, 
 			Date opened) {
 		
-		this(id, name, passcode);
+		this(name, passcode);
 		this.passcode = passcode;
 		this.numSavings = numSavings;
 		this.numChecking = numChecking;

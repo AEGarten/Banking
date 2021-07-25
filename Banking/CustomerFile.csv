@@ -1,0 +1,11 @@
+numCustomers 2 
+Customer,444,Sam Johnson,2,0,Sun Jul 18 00:55:41 PDT 2021,null,secret,0
+SAVINGS,34,1200.59,0,0,Sun Jul 25 00:55:41 PDT 2021,1261.00,-60.40,teller withdrawal,Tue Jul 20 00:55:41 PDT 2021,null
+SAVINGS,39,6.10,0,0,Sun Jul 25 00:55:41 PDT 2021,0.01,6.00,teller deposit,Sat Jul 24 00:55:41 PDT 2021,null
+Customer,4543,Aidan Chartreuse,1,2,Sun Jul 25 00:55:41 PDT 2021,null,Passcode,1234
+CHECKING,92837,23.16,2,567890,null,null,null,null,Sun Jul 25 00:55:41 PDT 2021,null
+Fee,Sun Jul 25 00:55:41 PDT 2021,25.00,overdraft
+Fee,Sun Jul 25 00:55:41 PDT 2021,25.00,overdraft
+SAVINGS,567,100.01,1,567890,null,null,null,null,Sun Jul 25 00:55:41 PDT 2021,null
+Fee,Sun Jul 25 00:55:41 PDT 2021,25.00,overdraft
+CHECKING,92840,1000.15,0,0,null,null,null,null,Sun Jul 25 00:55:41 PDT 2021,null
