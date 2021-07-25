@@ -110,7 +110,6 @@ public class Server {
 							
 							if (msgOut.success) System.out.println("Client "+ sessionID +" logged in");
 							continue;
-//							msgIn = (Message) frClient.readObject(); //new input
 
 						}
 						//if from Teller
@@ -121,7 +120,6 @@ public class Server {
 							msgOut = validateTeller((TellerLogin) msgIn);								
 							toClient.writeObject(msgOut);	//response
 							closeConnection = !msgOut.success;
-//							msgIn = (Message) frClient.readObject(); //new input
 								
 							if (msgOut.success) {
 								System.out.print("Client "+ sessionID);
