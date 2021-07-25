@@ -34,4 +34,4 @@ public class NewCustomer extends Message {
 	public NewCustomer(Message m, String why) {
 		super(m, why);
 	}
-}
+} 
