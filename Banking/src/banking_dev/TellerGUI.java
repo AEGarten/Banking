@@ -242,7 +242,7 @@ public class TellerGUI {
 		logoutButton.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				try {
-					dismiss();
+					logout();
 				} catch (IOException e1) {
 					// TODO Auto-generated catch block
 					e1.printStackTrace();
@@ -490,7 +490,7 @@ public class TellerGUI {
 		logoutButton.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				try {
-					dismiss();
+					logout();
 				} catch (IOException e1) {
 					// TODO Auto-generated catch block
 					e1.printStackTrace();
@@ -674,6 +674,7 @@ public class TellerGUI {
 		Boolean success = teller.logout();
 		if (success) {
 			frame.dispose();
+			teller.closeConnection(); 
 			buildGUI();
 		}
 	}

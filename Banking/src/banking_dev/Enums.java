@@ -1,7 +1,13 @@
 package banking_dev;
 
 public class Enums {
-
+	public AccountType getAccountTypeChecking() {
+		return AccountType.CHECKING;
+	}
+	
+	public AccountType getAccountTypeSavings() {
+		return AccountType.SAVINGS;
+	}
 }
 
 enum Process {
@@ -32,4 +38,3 @@ enum Process {
 enum EmployeeType { EMPLOYEE, SUPERVISOR }
 
 enum AccountType { SAVINGS, CHECKING }
-
