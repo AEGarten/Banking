@@ -16,17 +16,12 @@ public class TellerGUI {
 
 	JLabel userName, accountNumber, balanceDisplay;
 
-	public TellerGUI() throws ClassNotFoundException {
+	TellerGUI() throws ClassNotFoundException {
 		teller = new Teller();
 		buildGUI();
 	}
 
-	public TellerGUI(Teller teller) {
-		this.teller = teller;
-		buildGUI();
-	}
-
-	public void buildGUI() {
+	private void buildGUI() {
 		frame = new JFrame("Banking");
 		frame.setPreferredSize(new Dimension(400, 400));
 		frame.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
@@ -56,7 +51,7 @@ public class TellerGUI {
 		frame.pack();
 	}
 
-	public void employeePanel() {
+	private void employeePanel() {
 		JPanel employeePanel = new JPanel();
 		frame.getContentPane().removeAll();
 		;
@@ -240,6 +235,24 @@ public class TellerGUI {
 			}
 		});
 		buttonBox.add(dismissButton);
+		buttonBox.add(Box.createVerticalStrut(10));
+
+		// Logout button
+		JButton logoutButton = new JButton("Logout");
+		logoutButton.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				try {
+					dismiss();
+				} catch (IOException e1) {
+					// TODO Auto-generated catch block
+					e1.printStackTrace();
+				} catch (ClassNotFoundException e1) {
+					// TODO Auto-generated catch block
+					e1.printStackTrace();
+				}
+			}
+		});
+		buttonBox.add(logoutButton);
 		buttonBox.add(Box.createVerticalStrut(10));
 
 		// Add box to panel
@@ -454,7 +467,7 @@ public class TellerGUI {
 				}
 			}
 		});
-
+		supervisorBox.add(addEmployeeButton);
 		// Remove employee button
 		JButton removeEmployeeButton = new JButton("Remove Employee");
 		removeEmployeeButton.addActionListener(new ActionListener() {
@@ -470,13 +483,33 @@ public class TellerGUI {
 				}
 			}
 		});
+		supervisorBox.add(removeEmployeeButton);
 
+		// Logout button
+		JButton logoutButton = new JButton("Logout");
+		logoutButton.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				try {
+					dismiss();
+				} catch (IOException e1) {
+					// TODO Auto-generated catch block
+					e1.printStackTrace();
+				} catch (ClassNotFoundException e1) {
+					// TODO Auto-generated catch block
+					e1.printStackTrace();
+				}
+			}
+		});
+		supervisorBox.add(logoutButton);
+		supervisorBox.add(Box.createVerticalStrut(10));
+		
+		// Add box to panel
 		supervisorPanel.add(supervisorBox);
 		frame.setVisible(true);
 		frame.pack();
 	}
 
-	public void login() throws IOException, ClassNotFoundException {
+	private void login() throws IOException, ClassNotFoundException {
 		Boolean success = false;
 		Boolean[] arr = null;
 		while (!success) {
@@ -499,7 +532,7 @@ public class TellerGUI {
 			employeePanel();
 	}
 
-	public void custLogin() throws IOException, ClassNotFoundException {
+	private void custLogin() throws IOException, ClassNotFoundException {
 		Boolean success = false;
 		while (!success) {
 			String ID = JOptionPane.showInputDialog(frame, "Enter ID:", "ID", JOptionPane.INFORMATION_MESSAGE);
@@ -516,7 +549,7 @@ public class TellerGUI {
 		}
 	}
 
-	public void newCustomer() throws IOException, ClassNotFoundException {
+	private void newCustomer() throws IOException, ClassNotFoundException {
 		String name = JOptionPane.showInputDialog(frame, "Enter Name:", "Name", JOptionPane.INFORMATION_MESSAGE);
 		if (name == null)
 			return;
@@ -532,7 +565,8 @@ public class TellerGUI {
 				JOptionPane.INFORMATION_MESSAGE);
 		if (numChecking == null)
 			return;
-		Boolean success = teller.newCustomer(name, passcode, Integer.parseInt(numSavings), Integer.parseInt(numChecking));
+		Boolean success = teller.newCustomer(name, passcode, Integer.parseInt(numSavings),
+				Integer.parseInt(numChecking));
 		if (success) {
 			JOptionPane.showMessageDialog(frame, "Customer Successfully Created");
 			userName.setText("Name:" + name);
@@ -541,7 +575,7 @@ public class TellerGUI {
 		}
 	}
 
-	public void removeCustomer() throws IOException, ClassNotFoundException {
+	private void removeCustomer() throws IOException, ClassNotFoundException {
 		Boolean success = teller.removeCustomer();
 		if (success) {
 			JOptionPane.showMessageDialog(frame, "Customer Successfully Deleted");
@@ -551,7 +585,7 @@ public class TellerGUI {
 		}
 	}
 
-	public void addSavings() throws IOException, ClassNotFoundException {
+	private void addSavings() throws IOException, ClassNotFoundException {
 		// String accountType = JOptionPane.showInputDialog(frame, "Enter Account Type
 		// (SAVINGS or CHECKINGS", "Account Type", JOptionPane.INFORMATION_MESSAGE);
 		Account newAccount = new Account(0, AccountType.SAVINGS);
@@ -560,14 +594,14 @@ public class TellerGUI {
 			JOptionPane.showMessageDialog(frame, "Successfully Added Savings Account");
 	}
 
-	public void addChecking() throws IOException, ClassNotFoundException {
+	private void addChecking() throws IOException, ClassNotFoundException {
 		Account newAccount = new Account(0, AccountType.CHECKING);
 		Boolean success = teller.addAccount(newAccount);
 		if (success)
 			JOptionPane.showMessageDialog(frame, "Successfully Added Checking Account");
 	}
 
-	public void removeAccount() throws IOException, ClassNotFoundException {
+	private void removeAccount() throws IOException, ClassNotFoundException {
 		String deleteAccount = JOptionPane.showInputDialog(frame, "Enter Account Number:", "Account to Delete",
 				JOptionPane.INFORMATION_MESSAGE);
 		if (deleteAccount == null)
@@ -578,7 +612,7 @@ public class TellerGUI {
 			JOptionPane.showMessageDialog(frame, "Successfully Deleted Account:" + deleteAccount);
 	}
 
-	public void deposit() throws IOException, ClassNotFoundException {
+	private void deposit() throws IOException, ClassNotFoundException {
 		String amount = JOptionPane.showInputDialog(frame, "Enter Amount:", "Amount", JOptionPane.INFORMATION_MESSAGE);
 		if (amount == null)
 			return;
@@ -592,7 +626,7 @@ public class TellerGUI {
 			getBalance(accountNumber);
 	}
 
-	public void withdraw() throws IOException, ClassNotFoundException {
+	private void withdraw() throws IOException, ClassNotFoundException {
 		String amount = JOptionPane.showInputDialog(frame, "Enter Amount:", "Amount", JOptionPane.INFORMATION_MESSAGE);
 		if (amount == null)
 			return;
@@ -607,7 +641,7 @@ public class TellerGUI {
 			getBalance(accountNumber);
 	}
 
-	public void transfer() throws IOException, ClassNotFoundException {
+	private void transfer() throws IOException, ClassNotFoundException {
 		String amount = JOptionPane.showInputDialog(frame, "Enter Amount:", "Amount", JOptionPane.INFORMATION_MESSAGE);
 		if (amount == null)
 			return;
@@ -626,7 +660,7 @@ public class TellerGUI {
 			getBalance(fromAccount);
 	}
 
-	public void dismiss() throws IOException, ClassNotFoundException {
+	private void dismiss() throws IOException, ClassNotFoundException {
 		Boolean success = teller.dismiss();
 		if (success) {
 			JOptionPane.showMessageDialog(frame, "Account session dismissed");
@@ -636,7 +670,7 @@ public class TellerGUI {
 		}
 	}
 
-	public void logout() throws IOException, ClassNotFoundException {
+	private void logout() throws IOException, ClassNotFoundException {
 		Boolean success = teller.logout();
 		if (success) {
 			frame.dispose();
@@ -644,7 +678,7 @@ public class TellerGUI {
 		}
 	}
 
-	public void addEmployee() throws IOException, ClassNotFoundException {
+	private void addEmployee() throws IOException, ClassNotFoundException {
 		String name = JOptionPane.showInputDialog(frame, "Enter Name:", "Name", JOptionPane.INFORMATION_MESSAGE);
 		String username = JOptionPane.showInputDialog(frame, "Enter username:", "Username",
 				JOptionPane.INFORMATION_MESSAGE);
@@ -657,7 +691,7 @@ public class TellerGUI {
 			JOptionPane.showMessageDialog(frame, "Successfully Added Employe: " + name);
 	}
 
-	public void removeEmployee() throws IOException, ClassNotFoundException {
+	private void removeEmployee() throws IOException, ClassNotFoundException {
 		String name = JOptionPane.showInputDialog(frame, "Enter Name:", "Name", JOptionPane.INFORMATION_MESSAGE);
 		String ID = JOptionPane.showInputDialog(frame, "Enter ID:", "ID", JOptionPane.INFORMATION_MESSAGE);
 		Boolean success = teller.removeEmployee(name, ID);
@@ -665,7 +699,7 @@ public class TellerGUI {
 			JOptionPane.showMessageDialog(frame, "Successfully Removed Employee: " + name);
 	}
 
-	public void getBalance(String accountNumber) {
+	private void getBalance(String accountNumber) {
 		String displayBalance = teller.getBalance(Integer.parseInt(accountNumber));
 		balanceDisplay.setText(displayBalance);
 		frame.pack();
