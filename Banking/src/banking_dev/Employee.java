@@ -1,4 +1,5 @@
 package banking_dev;
+
 import java.io.Serializable;
 
 public class Employee implements Serializable {
@@ -22,6 +23,13 @@ public class Employee implements Serializable {
 		this.name = name;
 		this.loginusername = loginusername;
 		this.loginpwd = loginpwd;
+	}
+	
+	public Employee(String name, String loginusername, String loginpwd, EmployeeType type) {
+		this.name = name;
+		this.loginusername = loginusername;
+		this.loginpwd = loginpwd;
+		this.type = type;
 	}
 
 	public String getName() {return name;}
