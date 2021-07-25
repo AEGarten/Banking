@@ -17,9 +17,9 @@ package banking_dev;
 	 */
 
 public class TellerLogin extends Message {
-	String login = "";
-	String password = "";
-	boolean supervisor = false;
+	public String login = "";
+	public String password = "";
+	public boolean supervisor = false;
 	
 	//for Teller
 	public TellerLogin(String login, String pw) {

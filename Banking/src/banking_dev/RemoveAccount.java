@@ -17,9 +17,9 @@ package banking_dev;
  */
 
 public class RemoveAccount extends Message {
-	int customerID;
-	int accountID;
-	Customer customer;
+	public int customerID;
+	public int accountID;
+	public Customer customer;
 	
 	public RemoveAccount(Customer customer, int sessionID, Account acct) {
 		super(sessionID, Process.CLOSE_ACCOUNT);
