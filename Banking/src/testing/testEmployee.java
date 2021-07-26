@@ -9,6 +9,7 @@ import banking_dev.*;
 public class testEmployee {
 	EmployeeType employeetype = null;
 	
+	
 	@Test
 	public void constructor1() {
 		Employee employee = new Employee("Dolu", "dolu123", "doluodumosu");

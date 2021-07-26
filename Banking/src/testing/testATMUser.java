@@ -8,8 +8,6 @@ import banking_dev.*;
 
 public class testATMUser {
 	ATMUser user = new ATMUser();
-	
-
 	@Test
 	public void set_getATMUserID() {
 		user.setATMUserID(567890);
