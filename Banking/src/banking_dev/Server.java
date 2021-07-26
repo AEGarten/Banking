@@ -141,7 +141,12 @@ public class Server {
 					if (validated) {
 						switch(msgIn.perform) {
 						
-						case LOGOUT: msgOut = logout((Logout) msgIn); break;
+						case LOGOUT: {
+							msgOut = logout((Logout) msgIn);
+							toClient.writeObject(msgOut);
+							closeConnection = true;
+							continue;
+						} 
 						
 	//					case SAVE: {
 //							if (!online) {
