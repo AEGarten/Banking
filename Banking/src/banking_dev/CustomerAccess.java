@@ -22,20 +22,20 @@ public class CustomerAccess extends Message {
 	public Customer customer = null;
 	
 	//Teller
-	CustomerAccess(int sessionID, String passcode, int customerID){
+	public CustomerAccess(int sessionID, String passcode, int customerID){
 		super(sessionID, Process.CUSTOMER_ACCESS);
 		this.passcode = passcode;
 		this.customerID = customerID;
 	}
 	
 	//Server success
-	CustomerAccess(Customer c, Message m){
+	public CustomerAccess(Customer c, Message m){
 		super(m.sessionID, m.id, true);
 		this.customer = c;
 	}
 	
 	//Server fail
-		CustomerAccess(Message m, String why){
-			super(m, why);
-		}
+	public CustomerAccess(Message m, String why){
+		super(m, why);
+	}
 }
