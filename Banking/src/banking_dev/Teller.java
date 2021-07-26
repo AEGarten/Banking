@@ -14,14 +14,8 @@ import java.util.*;
 
 public class Teller {
 	private Socket socket;
-	private Employee employee;
 	private ArrayList<Message> messagesOut = new ArrayList<Message>();
-	private Message message;
 	private int sessionID;
-	private String employeeUsername;
-	private String tellerPW;
-	private int customerID;
-	private String customerPW;
 	private Boolean tellerType;
 	private Boolean tellerConnected;
 	private Boolean custConnected;
@@ -34,15 +28,10 @@ public class Teller {
 
 	public Teller() throws ClassNotFoundException {
 		sessionID = 0;
-		employeeUsername = "";
-		customerID = 0;
-		customerPW = tellerPW = "";
 		tellerConnected = false;
 		custConnected = false;
-		message = new Message();
-		
 		try {
-			socket = new Socket("localhost", 1234);
+			socket = new Socket("71.198.106.118", 1234);
 			outputstream = socket.getOutputStream();
 			objectOutputStream = new ObjectOutputStream(outputstream);
 			inputstream = socket.getInputStream();
@@ -155,8 +144,8 @@ public class Teller {
 	public Boolean transfer(String fromAccount, String toAccount, String transferAmount)
 			throws IOException, ClassNotFoundException {
 		Money money = convertMoney(Double.parseDouble(transferAmount));
-		TellerTransfer tTransfer = new TellerTransfer(customer, sessionID, money, Integer.parseInt(transferAmount),
-				Integer.parseInt(transferAmount));
+		TellerTransfer tTransfer = new TellerTransfer(customer, sessionID, money, Integer.parseInt(toAccount),
+				Integer.parseInt(fromAccount));
 		objectOutputStream.writeObject(tTransfer);
 
 		TellerTransfer tReceive = (TellerTransfer) objectInputStream.readObject();

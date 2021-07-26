@@ -14,7 +14,7 @@ public class TellerGUI {
 	private CustomerInfo cust;
 	// private JPanel panel;
 
-	JLabel userName, accountNumber, balanceDisplay;
+	JLabel userName, checkingNumber, checkingBalance, savingsNumber, savingsBalance, temp;
 
 	TellerGUI() throws ClassNotFoundException {
 		teller = new Teller();
@@ -23,7 +23,7 @@ public class TellerGUI {
 
 	private void buildGUI() {
 		frame = new JFrame("Banking");
-		frame.setPreferredSize(new Dimension(400, 400));
+		frame.setPreferredSize(new Dimension(1000, 500));
 		frame.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
 		JPanel loginPanel = new JPanel();
 		frame.add(loginPanel);
@@ -61,10 +61,15 @@ public class TellerGUI {
 		Box box = Box.createVerticalBox();
 		userName = new JLabel("Name:");
 		box.add(userName);
-		accountNumber = new JLabel("Account Number:");
-		box.add(accountNumber);
-		balanceDisplay = new JLabel("Balance:");
-		box.add(balanceDisplay);
+		checkingNumber = new JLabel("Checking Number:");
+		box.add(checkingNumber);
+		checkingBalance = new JLabel("Checking Balance:");
+		box.add(checkingBalance);
+		savingsNumber = new JLabel("Savings Number:");
+		box.add(savingsNumber);
+		savingsBalance = new JLabel("Savings Balance:");
+		box.add(savingsBalance);
+
 		employeePanel.add(box);
 		employeePanel.add(Box.createHorizontalStrut(50));
 
@@ -77,8 +82,7 @@ public class TellerGUI {
 			public void actionPerformed(ActionEvent e) {
 				try {
 					custLogin();
-					customer = cust.customer;
-					userName.setText("Name: " + customer.getName());
+					update();
 				} catch (IOException e1) {
 					// TODO Auto-generated catch block
 					e1.printStackTrace();
@@ -135,6 +139,7 @@ public class TellerGUI {
 			public void actionPerformed(ActionEvent e) {
 				try {
 					deposit();
+					update();
 				} catch (IOException e1) {
 					// TODO Auto-generated catch block
 					e1.printStackTrace();
@@ -153,6 +158,7 @@ public class TellerGUI {
 			public void actionPerformed(ActionEvent e) {
 				try {
 					withdraw();
+					update();
 				} catch (IOException e1) {
 					// TODO Auto-generated catch block
 					e1.printStackTrace();
@@ -163,6 +169,25 @@ public class TellerGUI {
 			}
 		});
 		buttonBox.add(withdrawButton);
+		buttonBox.add(Box.createVerticalStrut(10));
+
+		// Transfer button
+		JButton transferButton = new JButton("Transfer");
+		transferButton.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				try {
+					transfer();
+					update();
+				} catch (IOException e1) {
+					// TODO Auto-generated catch block
+					e1.printStackTrace();
+				} catch (ClassNotFoundException e1) {
+					// TODO Auto-generated catch block
+					e1.printStackTrace();
+				}
+			}
+		});
+		buttonBox.add(transferButton);
 		buttonBox.add(Box.createVerticalStrut(10));
 
 		// Add new savings account button
@@ -272,10 +297,11 @@ public class TellerGUI {
 		Box box = Box.createVerticalBox();
 		userName = new JLabel("Name:");
 		box.add(userName);
-		accountNumber = new JLabel("Account Number:");
-		box.add(accountNumber);
-		balanceDisplay = new JLabel("Balance:");
-		box.add(balanceDisplay);
+		checkingNumber = new JLabel("Account Number:");
+		box.add(checkingNumber);
+		checkingBalance = new JLabel("Checking Balance:");
+		box.add(checkingBalance);
+
 		supervisorPanel.add(box);
 		supervisorPanel.add(Box.createHorizontalStrut(50));
 		Box buttonBox = Box.createVerticalBox();
@@ -286,8 +312,7 @@ public class TellerGUI {
 			public void actionPerformed(ActionEvent e) {
 				try {
 					custLogin();
-					customer = cust.customer;
-					userName.setText("Name: " + customer.getName());
+					update();
 				} catch (IOException e1) {
 					// TODO Auto-generated catch block
 					e1.printStackTrace();
@@ -344,6 +369,7 @@ public class TellerGUI {
 			public void actionPerformed(ActionEvent e) {
 				try {
 					deposit();
+					update();
 				} catch (IOException e1) {
 					// TODO Auto-generated catch block
 					e1.printStackTrace();
@@ -362,6 +388,7 @@ public class TellerGUI {
 			public void actionPerformed(ActionEvent e) {
 				try {
 					withdraw();
+					update();
 				} catch (IOException e1) {
 					// TODO Auto-generated catch block
 					e1.printStackTrace();
@@ -372,6 +399,25 @@ public class TellerGUI {
 			}
 		});
 		buttonBox.add(withdrawButton);
+		buttonBox.add(Box.createVerticalStrut(10));
+
+		// Transfer button
+		JButton transferButton = new JButton("Transfer");
+		transferButton.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				try {
+					transfer();
+					update();
+				} catch (IOException e1) {
+					// TODO Auto-generated catch block
+					e1.printStackTrace();
+				} catch (ClassNotFoundException e1) {
+					// TODO Auto-generated catch block
+					e1.printStackTrace();
+				}
+			}
+		});
+		buttonBox.add(transferButton);
 		buttonBox.add(Box.createVerticalStrut(10));
 
 		// Add new savings account button
@@ -502,7 +548,7 @@ public class TellerGUI {
 		});
 		supervisorBox.add(logoutButton);
 		supervisorBox.add(Box.createVerticalStrut(10));
-		
+
 		// Add box to panel
 		supervisorPanel.add(supervisorBox);
 		frame.setVisible(true);
@@ -545,7 +591,6 @@ public class TellerGUI {
 
 			cust = teller.custLogin(password, Integer.parseInt(ID));
 			success = cust.bool;
-
 		}
 	}
 
@@ -570,8 +615,8 @@ public class TellerGUI {
 		if (success) {
 			JOptionPane.showMessageDialog(frame, "Customer Successfully Created");
 			userName.setText("Name:" + name);
-			accountNumber.setText("Account Number:");
-			balanceDisplay.setText("Balance:");
+			checkingNumber.setText("Checking Number:");
+			checkingBalance.setText("Checking Balance:");
 		}
 	}
 
@@ -580,25 +625,23 @@ public class TellerGUI {
 		if (success) {
 			JOptionPane.showMessageDialog(frame, "Customer Successfully Deleted");
 			userName.setText("Name:");
-			accountNumber.setText("Account Number:");
-			balanceDisplay.setText("Balance:");
+			checkingNumber.setText("Checking Number:");
+			checkingBalance.setText("Checking Balance:");
 		}
 	}
 
 	private void addSavings() throws IOException, ClassNotFoundException {
-		// String accountType = JOptionPane.showInputDialog(frame, "Enter Account Type
-		// (SAVINGS or CHECKINGS", "Account Type", JOptionPane.INFORMATION_MESSAGE);
-		Account newAccount = new Account(0, AccountType.SAVINGS);
+		/*Account newAccount = new Account(0, AccountType.SAVINGS);
 		Boolean success = teller.addAccount(newAccount);
 		if (success)
-			JOptionPane.showMessageDialog(frame, "Successfully Added Savings Account");
+			JOptionPane.showMessageDialog(frame, "Successfully Added Savings Account");*/
 	}
 
 	private void addChecking() throws IOException, ClassNotFoundException {
-		Account newAccount = new Account(0, AccountType.CHECKING);
+		/*Account newAccount = new Account(0, AccountType.CHECKING);
 		Boolean success = teller.addAccount(newAccount);
 		if (success)
-			JOptionPane.showMessageDialog(frame, "Successfully Added Checking Account");
+			JOptionPane.showMessageDialog(frame, "Successfully Added Checking Account");*/
 	}
 
 	private void removeAccount() throws IOException, ClassNotFoundException {
@@ -614,7 +657,7 @@ public class TellerGUI {
 
 	private void deposit() throws IOException, ClassNotFoundException {
 		String amount = JOptionPane.showInputDialog(frame, "Enter Amount:", "Amount", JOptionPane.INFORMATION_MESSAGE);
-		if (amount == null)
+		if (amount == null || Integer.parseInt(amount) < 0)
 			return;
 		String accountNumber = JOptionPane.showInputDialog(frame, "Enter Account Number:", "Account Number",
 				JOptionPane.INFORMATION_MESSAGE);
@@ -623,12 +666,13 @@ public class TellerGUI {
 
 		Boolean success = teller.deposit(accountNumber, amount);
 		if (success)
-			getBalance(accountNumber);
+			//getBalance(accountNumber);
+			update();
 	}
 
 	private void withdraw() throws IOException, ClassNotFoundException {
 		String amount = JOptionPane.showInputDialog(frame, "Enter Amount:", "Amount", JOptionPane.INFORMATION_MESSAGE);
-		if (amount == null)
+		if (amount == null || Integer.parseInt(amount) < 0)
 			return;
 		String accountNumber = JOptionPane.showInputDialog(frame, "Enter Account Number:", "Account Number",
 				JOptionPane.INFORMATION_MESSAGE);
@@ -638,18 +682,18 @@ public class TellerGUI {
 		Boolean success = teller.withdraw(accountNumber, amount);
 
 		if (success)
-			getBalance(accountNumber);
+			update();
 	}
 
 	private void transfer() throws IOException, ClassNotFoundException {
 		String amount = JOptionPane.showInputDialog(frame, "Enter Amount:", "Amount", JOptionPane.INFORMATION_MESSAGE);
-		if (amount == null)
+		if (amount == null || Integer.parseInt(amount) < 0)
 			return;
 		String fromAccount = JOptionPane.showInputDialog(frame, "Enter Account Number to Transfer From:",
 				"From Account Number", JOptionPane.INFORMATION_MESSAGE);
 		if (fromAccount == null)
 			return;
-		String toAccount = JOptionPane.showInputDialog(frame, "Enter Account number to Transfer To:",
+		String toAccount = JOptionPane.showInputDialog(frame, "Enter Account Number to Transfer To:",
 				"To Account Number", JOptionPane.INFORMATION_MESSAGE);
 		if (toAccount == null)
 			return;
@@ -657,7 +701,7 @@ public class TellerGUI {
 		Boolean success = teller.transfer(fromAccount, toAccount, amount);
 
 		if (success)
-			getBalance(fromAccount);
+			update();
 	}
 
 	private void dismiss() throws IOException, ClassNotFoundException {
@@ -665,8 +709,10 @@ public class TellerGUI {
 		if (success) {
 			JOptionPane.showMessageDialog(frame, "Account session dismissed");
 			userName.setText("Name:");
-			accountNumber.setText("Account Number:");
-			balanceDisplay.setText("Balance:");
+			checkingNumber.setText("Checking Number:");
+			checkingBalance.setText("Checking Balance:");
+			savingsNumber.setText("Savings Number:");
+			savingsBalance.setText("Savings Balance:");
 		}
 	}
 
@@ -674,8 +720,8 @@ public class TellerGUI {
 		Boolean success = teller.logout();
 		if (success) {
 			frame.dispose();
-			teller.closeConnection(); 
-			buildGUI();
+			teller.closeConnection();
+			TellerGUI newTeller = new TellerGUI();
 		}
 	}
 
@@ -699,10 +745,16 @@ public class TellerGUI {
 		if (success)
 			JOptionPane.showMessageDialog(frame, "Successfully Removed Employee: " + name);
 	}
-
-	private void getBalance(String accountNumber) {
-		String displayBalance = teller.getBalance(Integer.parseInt(accountNumber));
-		balanceDisplay.setText(displayBalance);
-		frame.pack();
+	
+	private void update() {
+		customer = cust.customer;
+		userName.setText("Name: " + customer.getName());
+		String[] custData = customer.toString().split("\n");
+		String[] splitChecking = custData[1].split(" ");
+		String[] splitSavings = custData[2].split(" ");
+		checkingNumber.setText("Checking Number: " + splitChecking[0]);
+		checkingBalance.setText("Checking Balance: " + splitChecking[2]);
+		savingsNumber.setText("Savings Number: " + splitSavings[0]);
+		savingsBalance.setText("Savings Balance: " + splitSavings[2]);
 	}
 }
