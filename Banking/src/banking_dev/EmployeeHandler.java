@@ -16,13 +16,14 @@ public class EmployeeHandler {
 			String line = "";
 			while ((line = br.readLine()) != null) {
 				String[] data = line.split(",");
-				if(data.length == 5) {
+				if (data.length == 5) {
 					if (data[4] == "EMPLOYEE") {
-						Employee employee = new Employee(data[0], Integer.parseInt(data[1]), data[2], data[3], EmployeeType.EMPLOYEE);
+						Employee employee = new Employee(data[0], Integer.parseInt(data[1]), data[2], data[3],
+								EmployeeType.EMPLOYEE);
 						employees.add(employee);
-					}
-					else {
-						Employee employee = new Employee(data[0], Integer.parseInt(data[1]), data[2], data[3], EmployeeType.SUPERVISOR);
+					} else {
+						Employee employee = new Employee(data[0], Integer.parseInt(data[1]), data[2], data[3],
+								EmployeeType.SUPERVISOR);
 						employees.add(employee);
 					}
 				}
@@ -33,25 +34,27 @@ public class EmployeeHandler {
 		}
 		return employees;
 	}
-	
-	public void save(Employee employee) throws IOException {
-		String fileName = "BankEmployees.csv";
-		String name = employee.getName();
-		int ID = employee.getEmployeeID();
-		String userName = employee.getLoginusername();
-		String passWord = employee.getLoginpwd();
-		EmployeeType type = employee.getType();
-		String[] data = {name, String.valueOf(ID), userName, passWord, type.toString()};
+
+	public void save(ArrayList<Employee> employees, String filename) throws IOException {
+		String fileName = filename;
 		try (BufferedWriter br = new BufferedWriter(new FileWriter(fileName))) {
 			StringBuilder sb = new StringBuilder();
-			for (String item : data) {
-				sb.append(item);
-				sb.append(",");
+			for (var employee : employees) {
+				String name = employee.getName();
+				int ID = employee.getEmployeeID();
+				String userName = employee.getLoginusername();
+				String passWord = employee.getLoginpwd();
+				EmployeeType type = employee.getType();
+				String[] data = { name, String.valueOf(ID), userName, passWord, type.toString() };
+
+				for (String item : data) {
+					sb.append(item);
+					sb.append(",");
+				}
+				br.write(sb.toString());
+				br.close();
 			}
-			br.write(sb.toString());
-			br.close();
-		}
-		catch (FileNotFoundException e) {
+		} catch (FileNotFoundException e) {
 			e.printStackTrace();
 		}
 	}
