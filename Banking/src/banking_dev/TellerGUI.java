@@ -14,7 +14,7 @@ public class TellerGUI {
 	private CustomerInfo cust;
 	// private JPanel panel;
 
-	JLabel userName, checkingNumber, checkingBalance, savingsNumber, savingsBalance, temp;
+	JLabel title, userName, checkingNumber, checkingBalance, savingsNumber, savingsBalance, temp;
 
 	TellerGUI() throws ClassNotFoundException {
 		teller = new Teller();
@@ -29,9 +29,12 @@ public class TellerGUI {
 		frame.add(loginPanel);
 
 		Box loginBox = Box.createVerticalBox();
-		loginBox.add(Box.createVerticalStrut(10));
+		loginBox.add(Box.createVerticalStrut(100));
+		title = new JLabel("Welcome to Banking 401");
+		loginBox.add(title);
+		loginBox.add(Box.createVerticalStrut(100));
 		JButton loginButton = new JButton("Login");
-		loginButton.setBounds(20, 20, 80, 80);
+		loginButton.setBounds(300, 20, 80, 80);
 		loginButton.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				try {
@@ -668,7 +671,6 @@ public class TellerGUI {
 
 		Boolean success = teller.deposit(accountNumber, amount);
 		if (success)
-			// getBalance(accountNumber);
 			update();
 	}
 
