@@ -17,11 +17,11 @@ public class DataBase {
 	private ArrayList<Customer> customers;
 	private ArrayList<Employee> employees = new ArrayList<>();
 	private EmployeeHandler employeeFile;
-	private CustomerFileHandler customerFile = new CustomerFileHandler("CustomerFile.csv");
+	private CustomerFileHandler customerFile = new CustomerFileHandler("CustomerFile.csv", this);
 	private boolean dataBaseLoaded;
 	
 	//maps cards to their Customers, more efficient than searching each Customer then each Acct
-	private HashMap<Integer, Integer> cardToCustomerTable = new HashMap<>();
+	HashMap<Integer, Integer> cardToCustomerTable = new HashMap<>();
 	
 	//maps employee logins to their id, concurrent because it changes while Sever Onlines
 	private ConcurrentHashMap<String, Integer> loginToIDTable = new ConcurrentHashMap<>();
@@ -57,11 +57,15 @@ public class DataBase {
 	
 	
 	public synchronized Customer findCustomer(int custID) {
-		int foundIndex;
+		int foundIndex = 0;
 		Customer key = new Customer("name", "passcode");
-			
-		foundIndex = Collections.binarySearch(customers, key, 
-			(a, b) -> a.getID() - b.getID());		
+		
+		for (Customer c: customers) {
+			if (c.getID() == custID) break;
+			else foundIndex += 1;
+		}
+//		foundIndex = Collections.binarySearch(customers, key, 
+//			(a, b) -> a.getID() - b.getID());		
 		return (foundIndex > -1) ? customers.get(foundIndex) : null;
 	}
 	
@@ -169,6 +173,7 @@ public class DataBase {
 	
 	public boolean loadData() {
 		customers = customerFile.parse();
+		Collections.sort(customers, (a, b) -> a.getID() - b.getID());
 		return customers != null;
 	}
 	

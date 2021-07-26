@@ -6,13 +6,16 @@ import java.io.FileReader;
 import java.io.FileWriter;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.concurrent.ConcurrentHashMap;
 
 public class CustomerFileHandler {
 	
 	String filename;
+	DataBase db;
 	
-	public CustomerFileHandler(String filename) {
+	public CustomerFileHandler(String filename, DataBase db) {
 		this.filename = filename;
+		this.db = db;
 	}
 	
 	public String getFilename() { return filename; }
@@ -93,6 +96,8 @@ public class CustomerFileHandler {
 							ATMCard, 
 							Integer.parseInt(data[4]));
 					
+					if (ATMCard) db.cardToCustomerTable.put(account.getCardID(), customer.getID());
+					
 					if (!data[10].equals("null")) account.setClosed(new Date(data[10]));
 					
 					numFees = Integer.parseInt(data[3]);
@@ -128,8 +133,9 @@ public class CustomerFileHandler {
 							ATMCard, 
 							Integer.parseInt(data[4]));
 					
-					if (!data[10].equals("null")) account.setClosed(new Date(data[10]));
+					if (ATMCard) db.cardToCustomerTable.put(account.getCardID(), customer.getID());
 					
+					if (!data[10].equals("null")) account.setClosed(new Date(data[10]));
 					
 					numFees = Integer.parseInt(data[3]);
 					if (numFees == 0) customer.addAccount(account);
