@@ -586,19 +586,17 @@ public class TellerGUI {
 	}
 
 	private void addSavings() throws IOException, ClassNotFoundException {
-		// String accountType = JOptionPane.showInputDialog(frame, "Enter Account Type
-		// (SAVINGS or CHECKINGS", "Account Type", JOptionPane.INFORMATION_MESSAGE);
-		Account newAccount = new Account(0, AccountType.SAVINGS);
+		/*Account newAccount = new Account(0, AccountType.SAVINGS);
 		Boolean success = teller.addAccount(newAccount);
 		if (success)
-			JOptionPane.showMessageDialog(frame, "Successfully Added Savings Account");
+			JOptionPane.showMessageDialog(frame, "Successfully Added Savings Account");*/
 	}
 
 	private void addChecking() throws IOException, ClassNotFoundException {
-		Account newAccount = new Account(0, AccountType.CHECKING);
+		/*Account newAccount = new Account(0, AccountType.CHECKING);
 		Boolean success = teller.addAccount(newAccount);
 		if (success)
-			JOptionPane.showMessageDialog(frame, "Successfully Added Checking Account");
+			JOptionPane.showMessageDialog(frame, "Successfully Added Checking Account");*/
 	}
 
 	private void removeAccount() throws IOException, ClassNotFoundException {
