@@ -13,12 +13,18 @@ public class UniqueIDsTest {
 	
 	@Before
 	public void setupUniqueIDS( ) {
-		
+		uniques = new UniqueIDs();
 	}
 	
 	@Test
-	public void test() {
-		fail("Not yet implemented");
+	public void addsNewID() {
+		assert(uniques.addID(5));
+	}
+	
+	@Test
+	public void doesNotAddDuplicate() {
+		uniques.addID(5);
+		assert(uniques.addID(5));
 	}
 
 }
