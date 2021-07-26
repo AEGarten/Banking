@@ -40,7 +40,7 @@ public class testTeller {
 	@Test
 	public void testMoney() {
 		Money money = new Money(100.05);
-		assertEquals(money, teller.convertMoney(100.05));
+		assertEquals(money.toString(), teller.convertMoney(100.05).toString());
 	}
 
 	@Test
