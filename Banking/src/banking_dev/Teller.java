@@ -31,7 +31,7 @@ public class Teller {
 		tellerConnected = false;
 		custConnected = false;
 		try {
-			socket = new Socket("71.198.106.118", 1234);
+			socket = new Socket("localhost", 1234);
 			outputstream = socket.getOutputStream();
 			objectOutputStream = new ObjectOutputStream(outputstream);
 			inputstream = socket.getInputStream();
