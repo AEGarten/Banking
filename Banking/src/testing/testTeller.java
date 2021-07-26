@@ -40,7 +40,8 @@ public class testTeller {
 	}
 	@Test
 	public void testAddAccount() throws ClassNotFoundException, IOException {
-		Account account = new Account(0, AccountType.CHECKING);
+		Money money = new Money(0);
+		Account account = new Account(AccountType.CHECKING, money);
 		assertEquals(true,teller.addAccount(account)); 
 	}
 	@Test

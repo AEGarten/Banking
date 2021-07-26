@@ -631,17 +631,19 @@ public class TellerGUI {
 	}
 
 	private void addSavings() throws IOException, ClassNotFoundException {
-		/*Account newAccount = new Account(0, AccountType.SAVINGS);
-		Boolean success = teller.addAccount(newAccount);
-		if (success)
-			JOptionPane.showMessageDialog(frame, "Successfully Added Savings Account");*/
+		/*
+		 * Account newAccount = new Account(0, AccountType.SAVINGS); Boolean success =
+		 * teller.addAccount(newAccount); if (success)
+		 * JOptionPane.showMessageDialog(frame, "Successfully Added Savings Account");
+		 */
 	}
 
 	private void addChecking() throws IOException, ClassNotFoundException {
-		/*Account newAccount = new Account(0, AccountType.CHECKING);
-		Boolean success = teller.addAccount(newAccount);
-		if (success)
-			JOptionPane.showMessageDialog(frame, "Successfully Added Checking Account");*/
+		/*
+		 * Account newAccount = new Account(0, AccountType.CHECKING); Boolean success =
+		 * teller.addAccount(newAccount); if (success)
+		 * JOptionPane.showMessageDialog(frame, "Successfully Added Checking Account");
+		 */
 	}
 
 	private void removeAccount() throws IOException, ClassNotFoundException {
@@ -666,7 +668,7 @@ public class TellerGUI {
 
 		Boolean success = teller.deposit(accountNumber, amount);
 		if (success)
-			//getBalance(accountNumber);
+			// getBalance(accountNumber);
 			update();
 	}
 
@@ -745,7 +747,7 @@ public class TellerGUI {
 		if (success)
 			JOptionPane.showMessageDialog(frame, "Successfully Removed Employee: " + name);
 	}
-	
+
 	private void update() {
 		customer = cust.customer;
 		userName.setText("Name: " + customer.getName());
