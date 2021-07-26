@@ -1,3 +1,3 @@
 package banking_dev;
 
-enum EmployeeType { EMPLOYEE, SUPERVISOR }
+public enum EmployeeType { EMPLOYEE, SUPERVISOR }

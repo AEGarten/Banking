@@ -14,12 +14,12 @@ import java.net.UnknownHostException;
 public class ATMGUI {
 	
 	public boolean success = false;
-	private static Socket socketconnection;
+	//private static Socket socketconnection;
 	
 	
 	public static void main(String[] args) throws UnknownHostException, ClassNotFoundException, IOException {
 		try {
-			socketconnection = new Socket("71.198.106.118", 1234);
+			Socket socketconnection = new Socket("localhost", 1234);
 			OutputStream outputStream = socketconnection.getOutputStream();
 			ObjectOutputStream objectOutputStream = new ObjectOutputStream(outputStream);
 			ObjectInputStream inputStream = new ObjectInputStream(socketconnection.getInputStream());
