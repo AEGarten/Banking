@@ -9,8 +9,8 @@ import java.io.IOException;
 import java.util.ArrayList;
 
 public class EmployeeHandler {
-	public ArrayList<Employee> parse() throws IOException {
-		String fileName = "BankEmployees.csv";
+	public ArrayList<Employee> parse(String filename) throws IOException {
+		String fileName = filename;
 		ArrayList<Employee> employees = new ArrayList<>();
 		try (BufferedReader br = new BufferedReader(new FileReader(fileName))) {
 			String line = "";

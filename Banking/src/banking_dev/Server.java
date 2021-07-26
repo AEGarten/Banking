@@ -21,7 +21,7 @@ public class Server {
 	private static boolean stopping = false;
 	
 	//TODO make false when ATM fully functional
-	private static boolean online = true;		//Server starts up offline till Supervisor turns on
+	private static boolean online = db.isDataBaseLoaded() ? true : false;		//Server starts up online if file loaded correctly
 	
 	//for keeping track of clients, what type, re: what Customer, supervisor status; all mapped to session id
 	private static ConcurrentHashMap<Integer, ClientInfo> sessionIDs = new ConcurrentHashMap<>();
@@ -141,7 +141,12 @@ public class Server {
 					if (validated) {
 						switch(msgIn.perform) {
 						
-						case LOGOUT: msgOut = logout((Logout) msgIn); break;
+						case LOGOUT: {
+							msgOut = logout((Logout) msgIn);
+							toClient.writeObject(msgOut);
+							closeConnection = true;
+							continue;
+						} 
 						
 	//					case SAVE: {
 //							if (!online) {

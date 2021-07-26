@@ -1,3 +1,3 @@
 package banking_dev;
 
-enum AccountType { SAVINGS, CHECKING }
+public enum AccountType { SAVINGS, CHECKING }
