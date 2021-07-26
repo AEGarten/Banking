@@ -49,7 +49,7 @@ public class ATM {
 		//socketconnection = new Socket("localhost", 1234);
 		
 		String operation = "Login";
-		ATMLogin login = new ATMLogin(567890, 1234);
+		ATMLogin login = new ATMLogin(Integer.parseInt(ATMID), Integer.parseInt(ATMpin));
 		objectOutputStream.writeObject(login);
 		ATMLogin atmlogin = (ATMLogin) inputStream.readObject();
 		//ATMLogin atmlogin = (ATMLogin) talkToServer(login, operation);
