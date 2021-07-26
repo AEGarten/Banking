@@ -31,7 +31,9 @@ public class Customer implements Serializable {
 			int numChecking, int PIN, 
 			Date opened) {
 		
-		this(name, passcode);
+		this.name = name;
+		this.passcode = passcode;
+		this.id = id;
 		this.passcode = passcode;
 		this.numSavings = numSavings;
 		this.numChecking = numChecking;

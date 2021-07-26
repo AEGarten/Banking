@@ -21,7 +21,7 @@ public class Server {
 	private static boolean stopping = false;
 	
 	//TODO make false when ATM fully functional
-	private static boolean online = true;		//Server starts up offline till Supervisor turns on
+	private static boolean online = db.isDataBaseLoaded();		//Server starts up online if file loaded correctly
 	
 	//for keeping track of clients, what type, re: what Customer, supervisor status; all mapped to session id
 	private static ConcurrentHashMap<Integer, ClientInfo> sessionIDs = new ConcurrentHashMap<>();
