@@ -19,7 +19,7 @@ public class ATMGUI {
 	
 	public static void main(String[] args) throws UnknownHostException, ClassNotFoundException, IOException {
 		try {
-			Socket socketconnection = new Socket("71.198.106.118", 1234);
+			Socket socketconnection = new Socket("localhost", 1234);
 			OutputStream outputStream = socketconnection.getOutputStream();
 			ObjectOutputStream objectOutputStream = new ObjectOutputStream(outputStream);
 			ObjectInputStream inputStream = new ObjectInputStream(socketconnection.getInputStream());
