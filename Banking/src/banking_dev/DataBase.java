@@ -95,17 +95,22 @@ public class DataBase {
 		boolean success = false;
 		
 		if (customerIDs.addID(c.getID()) && customers.add(c)) {
+			if (c.getPIN() != 0) {
+				for (Account a: c.getAccounts()) {
+					if (a.hasAttachedCard()) cardToCustomerTable.put(a.getCardID(), c.getID());
+				}
+			}
 			success = true;
 			Collections.sort(customers, (a, b) -> a.getID() - b.getID()); //only sort if add successful
 		}
 		return success;
 	}
 	
-	public synchronized boolean addAccount(Customer c, Account a) {
-		//TODO: make installAccount, Customer, Employee. These are used to add new unID'd files to DataBase;
-		
-		return true;
-	}
+//	public synchronized boolean addAccount(Customer c, Account a) {
+//		//TODO: make installAccount, Customer, Employee. These are used to add new unID'd files to DataBase;
+//		
+//		return true;
+//	}
 	
 	public synchronized boolean addEmployee(Employee e) {
 		boolean success = false;
